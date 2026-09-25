@@ -1,0 +1,312 @@
+@import "tailwindcss";
+
+
+/* ============================================================
+   JeevanSetu — Design System
+   Flash-Flood Early Warning | SIH26192
+   ============================================================ */
+
+
+/* ── Colour Tokens ─────────────────────────────────────────── */
+:root {
+  --color-bg:         #07091a;
+  --color-bg2:        #0c1023;
+  --color-surface:    #111827cc;
+  --color-surface-solid: #111827;
+  --color-border:     #1f2937;
+  --color-border-bright: #2d3748;
+
+  /* Risk states */
+  --color-normal:     #22c55e;
+  --color-normal-dim: #166534;
+  --color-watch:      #eab308;
+  --color-watch-dim:  #854d0e;
+  --color-warning:    #f97316;
+  --color-warning-dim:#9a3412;
+  --color-critical:   #ef4444;
+  --color-critical-dim:#991b1b;
+
+  /* UI colours */
+  --color-accent:     #3b82f6;
+  --color-accent-dim: #1d4ed8;
+  --color-rain:       #60a5fa;
+  --color-soil:       #a78bfa;
+  --color-stream:     #34d399;
+
+  /* Text */
+  --color-text:       #f1f5f9;
+  --color-text-dim:   #cbd5e1;
+  --color-muted:      #64748b;
+  --color-muted-bright: #94a3b8;
+
+  /* Surfaces */
+  --glass-bg:         rgba(17, 24, 39, 0.75);
+  --glass-border:     rgba(255, 255, 255, 0.06);
+  --glass-blur:       blur(16px);
+
+  /* Spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+
+  /* Border radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.5);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.6);
+  --shadow-glow-normal:   0 0 20px rgba(34,197,94,0.25);
+  --shadow-glow-watch:    0 0 20px rgba(234,179,8,0.25);
+  --shadow-glow-warning:  0 0 20px rgba(249,115,22,0.3);
+  --shadow-glow-critical: 0 0 24px rgba(239,68,68,0.4);
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-med:  300ms ease;
+  --transition-slow: 600ms ease;
+}
+
+/* ── Reset ──────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  min-height: 100vh;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* ── Typography ─────────────────────────────────────────────── */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.hindi {
+  font-family: 'Noto Sans Devanagari', sans-serif;
+  line-height: 1.8;
+}
+
+.text-xs   { font-size: 11px; }
+.text-sm   { font-size: 13px; }
+.text-base { font-size: 15px; }
+.text-lg   { font-size: 18px; }
+.text-xl   { font-size: 22px; }
+.text-2xl  { font-size: 28px; }
+.text-3xl  { font-size: 36px; }
+.text-4xl  { font-size: 48px; }
+
+.font-light    { font-weight: 300; }
+.font-regular  { font-weight: 400; }
+.font-medium   { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold     { font-weight: 700; }
+.font-extrabold{ font-weight: 800; }
+.font-black    { font-weight: 900; }
+
+.text-muted    { color: var(--color-muted); }
+.text-muted-br { color: var(--color-muted-bright); }
+.text-dim      { color: var(--color-text-dim); }
+.text-accent   { color: var(--color-accent); }
+.text-rain     { color: var(--color-rain); }
+.text-soil     { color: var(--color-soil); }
+.text-stream   { color: var(--color-stream); }
+
+/* ── Glassmorphism Card ─────────────────────────────────────── */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  transition: border-color var(--transition-med), box-shadow var(--transition-med);
+}
+
+.glass-card:hover {
+  border-color: rgba(255,255,255,0.1);
+}
+
+/* ── Risk State Colour Classes ──────────────────────────────── */
+.risk-normal   { color: var(--color-normal); }
+.risk-watch    { color: var(--color-watch); }
+.risk-warning  { color: var(--color-warning); }
+.risk-critical { color: var(--color-critical); }
+
+.bg-risk-normal   { background: rgba(34,197,94,0.12);   border-color: rgba(34,197,94,0.25); }
+.bg-risk-watch    { background: rgba(234,179,8,0.12);   border-color: rgba(234,179,8,0.25); }
+.bg-risk-warning  { background: rgba(249,115,22,0.12);  border-color: rgba(249,115,22,0.25); }
+.bg-risk-critical { background: rgba(239,68,68,0.12);   border-color: rgba(239,68,68,0.25); }
+
+.border-risk-normal   { border-color: var(--color-normal) !important; }
+.border-risk-watch    { border-color: var(--color-watch) !important; }
+.border-risk-warning  { border-color: var(--color-warning) !important; }
+.border-risk-critical { border-color: var(--color-critical) !important; }
+
+/* ── Layout Utilities ───────────────────────────────────────── */
+.flex        { display: flex; }
+.flex-col    { flex-direction: column; }
+.items-center{ align-items: center; }
+.items-start { align-items: flex-start; }
+.justify-between { justify-content: space-between; }
+.justify-center  { justify-content: center; }
+.gap-1  { gap: var(--space-1); }
+.gap-2  { gap: var(--space-2); }
+.gap-3  { gap: var(--space-3); }
+.gap-4  { gap: var(--space-4); }
+.gap-6  { gap: var(--space-6); }
+.w-full { width: 100%; }
+.h-full { height: 100%; }
+
+.p-3  { padding: var(--space-3); }
+.p-4  { padding: var(--space-4); }
+.p-5  { padding: var(--space-5); }
+.p-6  { padding: var(--space-6); }
+.px-3 { padding-left: var(--space-3); padding-right: var(--space-3); }
+.px-4 { padding-left: var(--space-4); padding-right: var(--space-4); }
+.py-2 { padding-top: var(--space-2); padding-bottom: var(--space-2); }
+.py-3 { padding-top: var(--space-3); padding-bottom: var(--space-3); }
+.mt-2 { margin-top: var(--space-2); }
+.mt-3 { margin-top: var(--space-3); }
+.mt-4 { margin-top: var(--space-4); }
+.mb-2 { margin-bottom: var(--space-2); }
+.mb-3 { margin-bottom: var(--space-3); }
+.mb-4 { margin-bottom: var(--space-4); }
+
+.rounded-sm  { border-radius: var(--radius-sm); }
+.rounded-md  { border-radius: var(--radius-md); }
+.rounded-lg  { border-radius: var(--radius-lg); }
+.rounded-full{ border-radius: var(--radius-full); }
+
+/* ── Animations ─────────────────────────────────────────────── */
+
+/* Rain background */
+@keyframes rain-drift {
+  0%   { transform: translateY(-100px) translateX(0); opacity: 0; }
+  10%  { opacity: 0.6; }
+  90%  { opacity: 0.4; }
+  100% { transform: translateY(110vh) translateX(20px); opacity: 0; }
+}
+
+/* Pulse ring for critical wards */
+@keyframes pulse-ring {
+  0%   { transform: scale(1);   opacity: 0.8; }
+  50%  { transform: scale(1.05); opacity: 0.4; }
+  100% { transform: scale(1);   opacity: 0.8; }
+}
+
+/* Screen flash for critical alert */
+@keyframes flash-critical {
+  0%   { box-shadow: 0 0 0px rgba(239,68,68,0); }
+  30%  { box-shadow: 0 0 60px rgba(239,68,68,0.5); }
+  100% { box-shadow: 0 0 24px rgba(239,68,68,0.3); }
+}
+
+/* Slide down for alert panel */
+@keyframes slide-down {
+  from { transform: translateY(-20px); opacity: 0; }
+  to   { transform: translateY(0);     opacity: 1; }
+}
+
+/* Fade in for feed entries */
+@keyframes fade-in-up {
+  from { transform: translateY(8px); opacity: 0; }
+  to   { transform: translateY(0);   opacity: 1; }
+}
+
+/* Number roll (used by counters) */
+@keyframes count-up {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Shimmer effect on bars */
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+
+/* Glow pulse */
+@keyframes glow-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.6; }
+}
+
+/* Bar fill animation */
+@keyframes bar-fill {
+  from { width: 0%; }
+}
+
+.animate-slide-down  { animation: slide-down 0.4s ease both; }
+.animate-fade-in-up  { animation: fade-in-up 0.4s ease both; }
+.animate-pulse-ring  { animation: pulse-ring 2s ease-in-out infinite; }
+.animate-glow-pulse  { animation: glow-pulse 2s ease-in-out infinite; }
+.animate-flash       { animation: flash-critical 1s ease both; }
+.animate-count       { animation: count-up 0.3s ease both; }
+
+/* ── Scrollbar ──────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-border-bright); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-muted); }
+
+/* ── Rain Background Canvas ─────────────────────────────────── */
+#rain-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.18;
+}
+
+/* ── App Root Layout ────────────────────────────────────────── */
+#root {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+}
+
+.app-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ── Divider ────────────────────────────────────────────────── */
+.divider {
+  width: 100%;
+  height: 1px;
+  background: var(--color-border);
+  margin: var(--space-4) 0;
+}
+
+.divider-v {
+  width: 1px;
+  background: var(--color-border);
+  align-self: stretch;
+}
