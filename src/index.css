@@ -310,3 +310,166 @@ h1, h2, h3, h4, h5, h6 {
   background: var(--color-border);
   align-self: stretch;
 }
+
+/* ── Phase 5 Polish ─────────────────────────────────────────── */
+
+/* Enhanced glassmorphism on cards */
+.glass-card {
+  background: rgba(17, 24, 39, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04);
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.glass-card:hover {
+  box-shadow: 0 6px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.10);
+}
+
+/* Animated number roll */
+.num-roll {
+  font-variant-numeric: tabular-nums;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-block;
+}
+
+/* ── Keyframe animations ─────────────────────────────────────── */
+
+/* Ward polygon pulse at CRITICAL */
+@keyframes wardPulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.55; }
+}
+
+/* Alert panel flash on CRITICAL */
+@keyframes alertFlash {
+  0%   { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
+  15%  { box-shadow: 0 0 0 8px rgba(239,68,68,0.4); }
+  30%  { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
+  45%  { box-shadow: 0 0 0 8px rgba(239,68,68,0.25); }
+  60%  { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
+  100% { box-shadow: 0 0 20px rgba(239,68,68,0.2); }
+}
+
+/* Glow pulse for dots and indicators */
+@keyframes glow-pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 4px currentColor; }
+  50%       { opacity: 0.5; box-shadow: 0 0 10px currentColor; }
+}
+
+/* Slide down for alert panels */
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Feed item fade-in */
+@keyframes feedFadeIn {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* Shimmer for active buttons */
+@keyframes shimmer {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+/* Capacity bar fill animation */
+@keyframes barFill {
+  from { width: 0%; }
+  to   { width: var(--target-width); }
+}
+
+/* Safe route path dash animation */
+@keyframes routePulse {
+  0%, 100% { stroke-opacity: 1; }
+  50%       { stroke-opacity: 0.45; }
+}
+
+/* POI pulse on WARNING+ */
+@keyframes poiPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.6; transform: scale(1.1); }
+}
+
+/* Critical screen edge glow */
+@keyframes criticalEdge {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
+  50%       { box-shadow: 0 0 40px 8px rgba(239,68,68,0.08); }
+}
+
+/* Number counter smooth update */
+@keyframes numPop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+
+/* ── Scrollbar theming ───────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.12);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.22); }
+
+/* ── Range slider theming ────────────────────────────────────── */
+input[type="range"] {
+  appearance: none;
+  -webkit-appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  border: 2px solid rgba(255,255,255,0.3);
+  cursor: pointer;
+  box-shadow: 0 0 6px rgba(255,255,255,0.3);
+  transition: box-shadow 0.2s;
+}
+input[type="range"]::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 10px rgba(255,255,255,0.5);
+}
+
+/* ── Utility classes for Phase 5 ─────────────────────────────── */
+
+/* CRITICAL state — edge glow on entire viewport */
+.state-critical .app-wrapper {
+  animation: criticalEdge 3s ease-in-out infinite;
+}
+
+/* Smooth transitions on all interactive panels */
+button, [role="button"] {
+  transition: all 0.22s ease;
+}
+button:active {
+  transform: scale(0.97);
+}
+
+/* Ensure Devanagari text renders correctly */
+.hindi-text {
+  font-family: 'Noto Sans Devanagari', 'Inter', sans-serif;
+  line-height: 1.8;
+}
+
+/* Status dot pulse utility */
+.dot-pulse {
+  animation: glow-pulse 1.5s ease-in-out infinite;
+}
+
+/* Text truncation utility */
+.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
