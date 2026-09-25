@@ -2,7 +2,7 @@
 // Use these in JS/JSX wherever you need colours programmatically
 
 export const COLORS = {
-  bg:           '#07091a',
+  bg:           '#0a0f1e',
   bg2:          '#0c1023',
   surface:      '#111827',
   border:       '#1f2937',

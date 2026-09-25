@@ -59,7 +59,7 @@ export const SHELTERS = [
     name:            'Hilltop Community School',
     fullName:        'Hilltop Community School Shelter',
     ward:            'W5',
-    elevation:       1380,           // metres
+    elevation:       980,            // metres — as per plan spec
     totalCapacity:   120,
     address:         'Hilltop Ridge, Ward 5, Jeevanpur Valley',
     contactMock:     'Local Response Coordinator: +91-XXXXX-XXXXX',

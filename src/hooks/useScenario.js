@@ -149,6 +149,9 @@ export function useScenario() {
 
     // Derived risk data
     riskResult,              // { total, breakdown, pct, state }
+    riskState:  riskResult.state,       // 'NORMAL'|'WATCH'|'WARNING'|'CRITICAL'
+    riskScore:  riskResult.total,       // 0–100
+    riskBreakdown: riskResult.breakdown,// { rainfall, soil, stream, terrain }
     wardRisk,                // score for currently selected ward
     ward,                    // full ward object
 
