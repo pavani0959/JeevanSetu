@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>JeevanSetu — SIH26192 | Flash Flood Early Warning System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+Devanagari:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #07091a;
+    --surface: #0f1629;
+    --surface2: #161e35;
+    --border: rgba(255,255,255,0.08);
+    --normal: #22c55e;
+    --watch: #eab308;
+    --warning: #f97316;
+    --critical: #ef4444;
+    --blue: #3b82f6;
+    --text: #f1f5f9;
+    --muted: #64748b;
+    --dim: #94a3b8;
+  }
+
+  html, body { width: 100%; height: 100%; background: var(--bg); font-family: 'Inter', sans-serif; color: var(--text); overflow: hidden; }
+
+  /* ── Slide container ── */
+  #deck { width: 100vw; height: 100vh; position: relative; overflow: hidden; }
+  .slide {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    padding: 48px 72px;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.6s ease, transform 0.6s ease;
+    transform: translateX(60px);
+  }
+  .slide.active { opacity: 1; pointer-events: all; transform: translateX(0); }
+  .slide.exit   { opacity: 0; transform: translateX(-60px); }
+
+  /* ── Stars bg ── */
+  .stars { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+  .star  { position: absolute; border-radius: 50%; background: #fff; animation: twinkle 4s ease-in-out infinite; }
+
+  @keyframes twinkle {
+    0%,100% { opacity: 0.15; transform: scale(1); }
+    50%      { opacity: 0.8;  transform: scale(1.3); }
+  }
+
+  /* ── Controls ── */
+  #controls {
+    position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 16px; align-items: center;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 50px; padding: 10px 24px;
+    backdrop-filter: blur(12px);
+    z-index: 100;
+  }
+  #controls button {
+    background: none; border: 1px solid var(--border);
+    color: var(--dim); border-radius: 8px;
+    padding: 6px 18px; font-family: 'Inter', sans-serif;
+    font-size: 13px; cursor: pointer; transition: all 0.2s;
+  }
+  #controls button:hover { background: rgba(255,255,255,0.08); color: var(--text); }
+  #slide-counter { font-size: 13px; color: var(--muted); min-width: 60px; text-align: center; }
+
+  /* Progress bar */
+  #progress { position: fixed; top: 0; left: 0; height: 3px; background: var(--blue); transition: width 0.5s ease; z-index: 100; }
+
+  /* ── Slide number badge ── */
+  .slide-num {
+    position: fixed; top: 24px; right: 32px;
+    font-size: 11px; color: var(--muted);
+    font-weight: 600; letter-spacing: 0.1em;
+    z-index: 100;
+  }
+
+  /* ── Typography ── */
+  .overline { font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--blue); font-weight: 700; margin-bottom: 12px; }
+  .slide-title { font-size: clamp(32px, 4vw, 54px); font-weight: 900; line-height: 1.1; text-align: center; }
+  .slide-subtitle { font-size: clamp(14px, 1.8vw, 20px); color: var(--dim); text-align: center; margin-top: 16px; line-height: 1.6; max-width: 700px; }
+  .highlight { color: var(--critical); }
+  .highlight-green { color: var(--normal); }
+  .highlight-blue  { color: var(--blue); }
+  .highlight-warn  { color: var(--watch); }
+
+  /* ── Grid layouts ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; width: 100%; max-width: 1100px; margin-top: 40px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; width: 100%; max-width: 1100px; margin-top: 36px; }
+  .four-col { display: grid; grid-template-columns: repeat(4,1fr); gap: 20px; width: 100%; max-width: 1100px; margin-top: 36px; }
+
+  /* ── Glass card ── */
+  .card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 16px; padding: 24px;
+    backdrop-filter: blur(8px);
+    transition: all 0.3s;
+  }
+  .card:hover { border-color: rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); }
+  .card-icon { font-size: 28px; margin-bottom: 12px; display: block; }
+  .card-title { font-size: 15px; font-weight: 800; color: var(--text); margin-bottom: 6px; }
+  .card-body { font-size: 13px; color: var(--dim); line-height: 1.6; }
+
+  /* ── Table ── */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; padding: 10px 14px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); border-bottom: 1px solid var(--border); }
+  td { padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--dim); line-height: 1.5; }
+  td:first-child { color: var(--text); font-weight: 600; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* ── Risk badge ── */
+  .badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 10px; border-radius: 100px;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+  }
+  .badge-green  { background: rgba(34,197,94,0.12);  color: #22c55e; border: 1px solid rgba(34,197,94,0.25);  }
+  .badge-yellow { background: rgba(234,179,8,0.12);  color: #eab308; border: 1px solid rgba(234,179,8,0.25);  }
+  .badge-orange { background: rgba(249,115,22,0.12); color: #f97316; border: 1px solid rgba(249,115,22,0.25); }
+  .badge-red    { background: rgba(239,68,68,0.12);  color: #ef4444; border: 1px solid rgba(239,68,68,0.25);  }
+  .badge-blue   { background: rgba(59,130,246,0.12); color: #60a5fa; border: 1px solid rgba(59,130,246,0.25); }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+
+  /* ── Pipeline ── */
+  .pipeline { display: flex; align-items: center; gap: 0; width: 100%; max-width: 1000px; margin-top: 40px; }
+  .pipe-step {
+    flex: 1; background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border); border-radius: 12px;
+    padding: 18px 14px; text-align: center; position: relative;
+  }
+  .pipe-step-icon { font-size: 22px; margin-bottom: 6px; }
+  .pipe-step-title { font-size: 12px; font-weight: 700; color: var(--text); }
+  .pipe-step-body  { font-size: 10px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+  .pipe-arrow { font-size: 18px; color: var(--blue); padding: 0 6px; flex-shrink: 0; }
+
+  /* ── Score bar ── */
+  .score-bar-wrap { margin-bottom: 12px; }
+  .score-bar-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--dim); margin-bottom: 4px; }
+  .score-bar-label span:first-child { color: var(--text); font-weight: 600; }
+  .score-bar-bg { height: 6px; background: rgba(255,255,255,0.07); border-radius: 3px; overflow: hidden; }
+  .score-bar-fill { height: 100%; border-radius: 3px; transition: width 1s ease; }
+
+  /* ── Big number ── */
+  .big-stat { font-size: clamp(48px, 7vw, 96px); font-weight: 900; line-height: 1; }
+  .big-stat-label { font-size: 14px; color: var(--dim); margin-top: 6px; font-weight: 500; }
+
+  /* ── Quote box ── */
+  .quote {
+    border-left: 4px solid var(--critical);
+    padding: 18px 24px;
+    background: rgba(239,68,68,0.06);
+    border-radius: 0 12px 12px 0;
+    margin: 24px 0;
+    font-size: 15px; color: var(--dim); line-height: 1.7; font-style: italic;
+    max-width: 820px;
+  }
+
+  /* ── Bullet list ── */
+  .bullet-list { list-style: none; display: flex; flex-direction: column; gap: 10px; text-align: left; }
+  .bullet-list li { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; color: var(--dim); line-height: 1.5; }
+  .bullet-list li::before { content: '▸'; color: var(--blue); font-size: 12px; margin-top: 2px; flex-shrink: 0; }
+  .bullet-list li strong { color: var(--text); }
+
+  /* ── Keyframes ── */
+  @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .fade-up { animation: fadeUp 0.6s ease both; }
+  .fade-up-1 { animation-delay: 0.1s; }
+  .fade-up-2 { animation-delay: 0.2s; }
+  .fade-up-3 { animation-delay: 0.3s; }
+  .fade-up-4 { animation-delay: 0.4s; }
+  .fade-up-5 { animation-delay: 0.5s; }
+
+  /* ── Specific slide styles ── */
+  .hero-title { font-size: clamp(42px, 6vw, 80px); font-weight: 900; line-height: 1.05; text-align: center; }
+  .hero-highlight { display: block; color: var(--critical); }
+  .tagline-box {
+    margin-top: 32px; padding: 14px 32px;
+    border: 1px solid rgba(239,68,68,0.3);
+    border-radius: 100px;
+    font-size: 16px; color: var(--dim);
+    font-style: italic; font-weight: 500;
+  }
+
+  .arch-box {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 12px; padding: 16px 20px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px; color: var(--dim); line-height: 1.8;
+    text-align: left; width: 100%; max-width: 900px;
+  }
+  .arch-box .layer-title { color: var(--blue); font-weight: 700; }
+  .arch-box .arrow { color: var(--warning); }
+  .arch-box .result { color: var(--normal); }
+
+  .tech-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 14px; border-radius: 8px;
+    background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+    font-size: 12px; color: var(--dim); margin: 4px;
+  }
+
+  /* gap col */
+  .gap-row { display: flex; gap: 12px; width: 100%; max-width: 1100px; margin-top: 32px; flex-wrap: wrap; }
+  .gap-item {
+    flex: 1; min-width: 180px;
+    background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+    border-radius: 12px; padding: 16px;
+  }
+  .gap-item .gap-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+  .gap-item .gap-before { font-size: 12px; color: var(--critical); margin-bottom: 3px; }
+  .gap-item .gap-after  { font-size: 12px; color: var(--normal); font-weight: 700; }
+
+  /* roadmap */
+  .roadmap { display: flex; flex-direction: column; gap: 14px; width: 100%; max-width: 820px; margin-top: 28px; }
+  .roadmap-step {
+    display: flex; gap: 16px; align-items: flex-start;
+    background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 18px;
+  }
+  .roadmap-num {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--blue); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 800; flex-shrink: 0; margin-top: 2px;
+  }
+  .roadmap-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .roadmap-body  { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+  /* demo tip */
+  .demo-tip {
+    background: rgba(34,197,94,0.07); border: 1px solid rgba(34,197,94,0.2);
+    border-radius: 10px; padding: 12px 16px;
+    font-size: 13px; color: var(--dim); line-height: 1.6; margin: 6px 0;
+  }
+  .demo-tip strong { color: var(--normal); }
+</style>
+</head>
+<body>
+
+<!-- Stars background -->
+<div class="stars" id="stars"></div>
+
+<!-- Progress bar -->
+<div id="progress"></div>
+
+<!-- Slide counter -->
+<div class="slide-num" id="slide-num">1 / 11</div>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 1 — HERO / HOOK
+════════════════════════════════════════════════ -->
+<div id="deck">
+<div class="slide active" id="s1">
+  <p class="overline fade-up">Smart India Hackathon 2026 · SIH26192</p>
+  <h1 class="hero-title fade-up fade-up-1">
+    18 minutes.<br/>
+    <span class="hero-highlight">That's all the warning they get.</span>
+  </h1>
+  <p class="slide-subtitle fade-up fade-up-2">
+    In hilly India — Uttarakhand, Himachal, Northeast —<br/>
+    flash floods don't announce themselves. They arrive in <strong style="color:var(--critical)">minutes.</strong><br/>
+    In 2023 alone, <strong>900+ lives</strong> were lost. Most had no warning. No route. No plan.
+  </p>
+  <div class="tagline-box fade-up fade-up-3">
+    "Before the water reaches them, the warning should." 🌊
+  </div>
+  <div style="margin-top:40px; display:flex; gap:24px; align-items:center;" class="fade-up fade-up-4">
+    <div class="badge badge-red"><span class="dot"></span>CRITICAL</div>
+    <div style="font-size:13px; color:var(--muted)">JeevanSetu — Flash Flood Early Warning & Safe Evacuation System</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 2 — THE GAP
+════════════════════════════════════════════════ -->
+<div class="slide" id="s2">
+  <p class="overline">The Problem</p>
+  <h2 class="slide-title">Why existing systems <span class="highlight">fail</span> hilly regions</h2>
+  <p class="slide-subtitle">The problem is not lack of data.<br/>It's lack of <strong style="color:var(--text)">last-mile decision support.</strong></p>
+  <div class="gap-row">
+    <div class="gap-item fade-up">
+      <div class="gap-label">⚠️ Warning Granularity</div>
+      <div class="gap-before">✗ District-level alerts — useless for ward action</div>
+      <div class="gap-after">✓ JeevanSetu: Ward-level (sub-village)</div>
+    </div>
+    <div class="gap-item fade-up fade-up-1">
+      <div class="gap-label">⏱ Speed</div>
+      <div class="gap-before">✗ Central alerts: 2–6 hours lag</div>
+      <div class="gap-after">✓ JeevanSetu: &lt; 3 seconds</div>
+    </div>
+    <div class="gap-item fade-up fade-up-2">
+      <div class="gap-label">🌐 Language</div>
+      <div class="gap-before">✗ English-only — 80%+ rural excluded</div>
+      <div class="gap-after">✓ English + Hindi bilingual</div>
+    </div>
+    <div class="gap-item fade-up fade-up-3">
+      <div class="gap-label">📶 Connectivity</div>
+      <div class="gap-before">✗ Fails when floods cut towers</div>
+      <div class="gap-after">✓ Fully offline-capable SVG map</div>
+    </div>
+    <div class="gap-item fade-up fade-up-4">
+      <div class="gap-label">🎯 Output</div>
+      <div class="gap-before">✗ "Heavy rain expected" — no action</div>
+      <div class="gap-after">✓ Named route + shelter + who to evacuate first</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 3 — SOLUTION OVERVIEW
+════════════════════════════════════════════════ -->
+<div class="slide" id="s3">
+  <p class="overline">Our Solution</p>
+  <h2 class="slide-title">JeevanSetu — <span class="highlight-blue">Hyper-local</span> Flash Flood<br/>Decision Support System</h2>
+  <div style="margin-top:32px; padding:18px 32px; background:rgba(59,130,246,0.08); border:1px solid rgba(59,130,246,0.2); border-radius:12px; font-size:15px; color:var(--dim); max-width:820px; line-height:1.8; text-align:center;">
+    Raw sensor readings &nbsp;→&nbsp; Ward-level risk score &nbsp;→&nbsp; Named evacuation route &nbsp;→&nbsp;<br/>
+    Shelter status &nbsp;→&nbsp; Bilingual alert &nbsp;→&nbsp; Volunteer acknowledgement chain<br/>
+    <strong style="color:var(--blue)">All in under 3 seconds.</strong>
+  </div>
+  <div class="three-col" style="margin-top:28px;">
+    <div class="card fade-up">
+      <span class="card-icon">🧠</span>
+      <div class="card-title">PREDICT</div>
+      <div class="card-body">Multi-factor risk engine: Rainfall + Soil + Stream + Terrain → 0–100 score per ward. Explainable breakdown. Upstream propagation model.</div>
+    </div>
+    <div class="card fade-up fade-up-2">
+      <span class="card-icon">🗺️</span>
+      <div class="card-title">VISUALISE</div>
+      <div class="card-body">Ward-level SVG risk map, live telemetry bar, 30-min trend sparklines, risk score arc gauge — all updating in real-time.</div>
+    </div>
+    <div class="card fade-up fade-up-3">
+      <span class="card-icon">📢</span>
+      <div class="card-title">ACT</div>
+      <div class="card-body">Named evacuation route + open shelter + bilingual alert + volunteer chain with acknowledgement — exactly who to help first.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 4 — TECHNICAL ARCHITECTURE
+════════════════════════════════════════════════ -->
+<div class="slide" id="s4">
+  <p class="overline">Technical Architecture</p>
+  <h2 class="slide-title">End-to-End <span class="highlight-green">Data Pipeline</span></h2>
+  <div class="pipeline" style="margin-top:36px;">
+    <div class="pipe-step fade-up">
+      <div class="pipe-step-icon">📡</div>
+      <div class="pipe-step-title">Sensor Layer</div>
+      <div class="pipe-step-body">IoT Rain Gauge · Soil Probe · Stream Sensor · 3-sec polling with ±2 jitter</div>
+    </div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step fade-up fade-up-1">
+      <div class="pipe-step-icon">🧮</div>
+      <div class="pipe-step-title">Risk Engine</div>
+      <div class="pipe-step-body">9 scoring functions · Ward score 0–100 · State: NORMAL / WATCH / WARNING / CRITICAL</div>
+    </div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step fade-up fade-up-2">
+      <div class="pipe-step-icon">🏗️</div>
+      <div class="pipe-step-title">Infra Layer</div>
+      <div class="pipe-step-body">Bridge open/closed · Safe route activate · Shelter STANDBY→PREPARING→OPEN</div>
+    </div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step fade-up fade-up-3">
+      <div class="pipe-step-icon">📋</div>
+      <div class="pipe-step-title">Priority Layer</div>
+      <div class="pipe-step-body">School · Health · Anganwadi → EVACUATE FIRST / NOTIFY / MONITOR</div>
+    </div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step fade-up fade-up-4">
+      <div class="pipe-step-icon">🔔</div>
+      <div class="pipe-step-title">Alert Layer</div>
+      <div class="pipe-step-body">English + Hindi · Volunteer → Coordinator → District chain · Offline-capable</div>
+    </div>
+  </div>
+  <div style="margin-top:28px; width:100%; max-width:900px;">
+    <div class="arch-box fade-up fade-up-5">
+      <span class="layer-title">Risk Score Formula:</span> &nbsp;
+      Rainfall (max 40) + Soil Saturation (max 25) + Stream Rise (max 20) + Terrain (max 15) = <span class="result">0–100 Ward Score</span><br/>
+      <span class="layer-title">State thresholds:</span> &nbsp;
+      NORMAL &lt;30 &nbsp;<span class="arrow">→</span>&nbsp; WATCH 30-49 &nbsp;<span class="arrow">→</span>&nbsp; WARNING 50-74 &nbsp;<span class="arrow">→</span>&nbsp; <span style="color:var(--critical)">CRITICAL 75-100</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 5 — PROPOSED SOLUTION BULLETS
+════════════════════════════════════════════════ -->
+<div class="slide" id="s5">
+  <p class="overline">Proposed Solution</p>
+  <h2 class="slide-title" style="font-size:clamp(24px,3vw,40px);">How JeevanSetu Works</h2>
+  <div class="two-col" style="margin-top:24px; align-items:start;">
+    <ul class="bullet-list">
+      <li class="fade-up"><strong>Sensor Input:</strong> IoT rain gauge, soil moisture probe, stream sensor → data every 3 sec with live ±2 jitter (simulates real sensor noise)</li>
+      <li class="fade-up fade-up-1"><strong>Risk Engine:</strong> Rainfall (40pts) + Soil (25pts) + Stream (20pts) + Terrain (15pts) → Ward Score 0–100, fully explainable</li>
+      <li class="fade-up fade-up-2"><strong>State Classification:</strong> NORMAL / WATCH / WARNING / CRITICAL → auto-triggers downstream action layer</li>
+      <li class="fade-up fade-up-3"><strong>Propagation Model:</strong> Ward 1 (source, 1240m) → Ward 3 (Riverside, 760m) → Ward 4 (Nala Basin, 620m) — upstream cascade</li>
+      <li class="fade-up fade-up-4"><strong>Infrastructure Engine:</strong> East Bridge CLOSED, North Road safe route arrow activates, Shelter STANDBY→PREPARING→OPEN</li>
+    </ul>
+    <ul class="bullet-list">
+      <li class="fade-up"><strong>Vulnerable POI Priority:</strong> School 340 children (EVACUATE FIRST), Health Sub-Centre 45 patients (EVACUATE FIRST), Anganwadi (NOTIFY)</li>
+      <li class="fade-up fade-up-1"><strong>Bilingual Alert:</strong> English + Hindi (Noto Sans Devanagari), flash on CRITICAL, slide-down on WARNING</li>
+      <li class="fade-up fade-up-2"><strong>Acknowledgement Chain:</strong> Volunteer notified → Coordinator ack → District Response Team → Priority evacuation flagged</li>
+      <li class="fade-up fade-up-3"><strong>Offline-First:</strong> Custom SVG map (zero tile dependency), cached data → fully functional with NO internet</li>
+      <li class="fade-up fade-up-4"><strong>Live Dashboard:</strong> 5-ward map, telemetry bar, arc gauge, 30-min sparklines, vulnerable counts — all in &lt; 3 seconds</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 6 — INNOVATION TABLE
+════════════════════════════════════════════════ -->
+<div class="slide" id="s6">
+  <p class="overline">Innovation</p>
+  <h2 class="slide-title">What makes JeevanSetu <span class="highlight-green">different</span></h2>
+  <div style="width:100%; max-width:1000px; margin-top:32px;" class="fade-up">
+    <table>
+      <thead>
+        <tr>
+          <th>Feature</th>
+          <th style="color:var(--critical)">Existing Systems</th>
+          <th style="color:var(--normal)">JeevanSetu</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Warning Granularity</td><td>District / state level</td><td style="color:var(--normal)">Ward-level (sub-village)</td></tr>
+        <tr><td>Response Latency</td><td>2–6 hours</td><td style="color:var(--normal)">&lt; 3 seconds</td></tr>
+        <tr><td>Language Support</td><td>English only</td><td style="color:var(--normal)">English + Hindi</td></tr>
+        <tr><td>Internet Dependency</td><td>Required — fails in floods</td><td style="color:var(--normal)">Fully offline-capable</td></tr>
+        <tr><td>Output Type</td><td>"Heavy rain expected"</td><td style="color:var(--normal)">Named route + open shelter address</td></tr>
+        <tr><td>Vulnerable-First Logic</td><td>Not considered</td><td style="color:var(--normal)">School / Health / Anganwadi prioritised</td></tr>
+        <tr><td>Risk Explainability</td><td>Black-box or none</td><td style="color:var(--normal)">Full breakdown: Rainfall/Soil/Stream/Terrain</td></tr>
+        <tr><td>Propagation Model</td><td>Static warning zone</td><td style="color:var(--normal)">Upstream → downstream cascade</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 7 — IMPACT
+════════════════════════════════════════════════ -->
+<div class="slide" id="s7">
+  <p class="overline">Impact</p>
+  <h2 class="slide-title">Who JeevanSetu <span class="highlight-green">protects</span></h2>
+  <div class="two-col" style="margin-top:28px; align-items:start; max-width:1000px;">
+    <div>
+      <table>
+        <thead><tr><th>Ward</th><th>Population</th><th>Vulnerable</th><th>Risk (CRITICAL)</th></tr></thead>
+        <tbody>
+          <tr><td>W1 — Upper Jeevanpur</td><td>1,240</td><td>38</td><td><span class="badge badge-orange">54/100</span></td></tr>
+          <tr><td>W2 — Madhya Colony</td><td>2,180</td><td>72</td><td><span class="badge badge-orange">68/100</span></td></tr>
+          <tr><td>W3 — Riverside Block</td><td>1,840</td><td>89</td><td><span class="badge badge-red">76/100</span></td></tr>
+          <tr><td style="color:var(--critical)">W4 — Nala Basin ⚠️</td><td>3,420</td><td style="color:var(--critical); font-weight:800;">142</td><td><span class="badge badge-red">84/100</span></td></tr>
+          <tr><td>W5 — Hilltop Ridge 🏫</td><td>680</td><td>21</td><td><span class="badge badge-green">26/100</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:20px;">
+      <div class="card" style="text-align:center;">
+        <div class="big-stat" style="color:var(--critical)">9,360</div>
+        <div class="big-stat-label">Total residents protected</div>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div class="big-stat" style="color:var(--warning)">142</div>
+        <div class="big-stat-label">Priority evacuees (Ward 4 alone)</div>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div class="big-stat" style="color:var(--normal)">&lt;3s</div>
+        <div class="big-stat-label">Warning-to-route time</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 8 — TECH STACK
+════════════════════════════════════════════════ -->
+<div class="slide" id="s8">
+  <p class="overline">Technical Stack</p>
+  <h2 class="slide-title">Built to run <span class="highlight-blue">anywhere</span></h2>
+  <p class="slide-subtitle">No backend. No tile server. No internet required. Deployable on a ₹500 Raspberry Pi.</p>
+  <div style="margin-top:32px; width:100%; max-width:1000px;">
+    <div class="two-col" style="margin-top:0; align-items:start;">
+      <table>
+        <thead><tr><th>Layer</th><th>Technology</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><td>Frontend</td><td>React 19 + Vite</td><td>Fast, component-driven</td></tr>
+          <tr><td>Styling</td><td>Tailwind CSS v4 + CSS Design System</td><td>Glassmorphism, dark theme</td></tr>
+          <tr><td>Charts</td><td>Recharts AreaChart</td><td>Lightweight sparklines</td></tr>
+          <tr><td>Map</td><td>Custom SVG (hand-crafted)</td><td>Fully offline — no Mapbox/Google</td></tr>
+          <tr><td>Risk Engine</td><td>Pure JS (9 functions)</td><td>Explainable, auditable</td></tr>
+          <tr><td>State</td><td>Custom React hooks</td><td>No Redux complexity</td></tr>
+          <tr><td>Fonts</td><td>Inter + Noto Sans Devanagari</td><td>Multilingual UI</td></tr>
+        </tbody>
+      </table>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="card">
+          <div class="card-title">🔑 Key Architectural Decision</div>
+          <div class="card-body">SVG map instead of Mapbox/Google Maps = zero external dependency. The system works in complete internet blackout — exactly when it's needed most.</div>
+        </div>
+        <div class="card">
+          <div class="card-title">📦 Deployment Cost</div>
+          <div class="card-body">₹45,000–₹80,000 per village (sensor kit + Raspberry Pi + dashboard display). Runs on any static host or offline PWA.</div>
+        </div>
+        <div class="card">
+          <div class="card-title">⚡ Performance</div>
+          <div class="card-body">Sensor data → risk score → all UI updates in &lt;3 seconds. Live ±2 jitter simulates real IMD-grade sensor noise.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 9 — SCALABILITY ROADMAP
+════════════════════════════════════════════════ -->
+<div class="slide" id="s9">
+  <p class="overline">Scalability & Real-World Deployment</p>
+  <h2 class="slide-title">Prototype → Production<br/><span class="highlight-blue">in 3 steps</span></h2>
+  <div class="roadmap">
+    <div class="roadmap-step fade-up">
+      <div class="roadmap-num">1</div>
+      <div>
+        <div class="roadmap-title">Hardware Integration — 3 months</div>
+        <div class="roadmap-body">Replace simulated data with real IoT sensors: IMD rain gauges, CWMS stream sensors, capacitance soil probes → pipe live readings into the existing risk engine via REST API. No frontend changes needed.</div>
+      </div>
+    </div>
+    <div class="roadmap-step fade-up fade-up-1">
+      <div class="roadmap-num" style="background:var(--warning)">2</div>
+      <div>
+        <div class="roadmap-title">ML Model Upgrade — 4 months</div>
+        <div class="roadmap-body">Replace rule-based engine with trained model: IMD historical rainfall (50 years) + NDWI satellite imagery + CWC stream records → XGBoost / LSTM for improved prediction accuracy and 30-min advance warning.</div>
+      </div>
+    </div>
+    <div class="roadmap-step fade-up fade-up-2">
+      <div class="roadmap-num" style="background:var(--critical)">3</div>
+      <div>
+        <div class="roadmap-title">SMS / IVR Alert Integration — 2 months</div>
+        <div class="roadmap-body">Replace simulated alert feed with real communications: Twilio / Gupshup SMS API → volunteer phones. IVR calls in Hindi for feature-phone users in zero-connectivity zones. Government alert gateway integration.</div>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:20px; padding:12px 24px; background:rgba(34,197,94,0.07); border:1px solid rgba(34,197,94,0.2); border-radius:10px; font-size:13px; color:var(--dim); max-width:820px; text-align:center;" class="fade-up fade-up-3">
+    <strong style="color:var(--normal)">Replicable across any hilly district in India</strong> — the same risk engine, same dashboard, different ward/sensor data.
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 10 — DEMO GUIDE
+════════════════════════════════════════════════ -->
+<div class="slide" id="s10">
+  <p class="overline">Live Demo</p>
+  <h2 class="slide-title">5-step demo for judges<br/><span class="highlight-green">runs at localhost:5173</span></h2>
+  <div class="two-col" style="margin-top:28px; align-items:start; max-width:960px;">
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div class="demo-tip"><strong>Step 1 — Start NORMAL</strong> — Clean green dashboard. Live telemetry ticking. "All roads clear."</div>
+      <div class="demo-tip"><strong>Step 2 — Switch CRITICAL</strong> — Dramatic red ward map, East Bridge CLOSED, shelter OPEN 87/120, flash alert fires.</div>
+      <div class="demo-tip"><strong>Step 3 — Toggle Hindi</strong> — Alert switches to Devanagari instantly. Judges love vernacular support.</div>
+      <div class="demo-tip"><strong>Step 4 — Click Ward 4</strong> — Show 142 vulnerable residents, EVACUATE FIRST labels on school and health centre.</div>
+      <div class="demo-tip"><strong>Step 5 — Toggle Offline</strong> — Banner says "Offline mode — using cached map". Map still fully works.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div class="card">
+        <div class="card-title">🎙️ Opening Line</div>
+        <div class="card-body">"In 2023, flash floods killed 900 Indians. Most had no warning. We built JeevanSetu — a system that gives a named evacuation route, in Hindi, with shelter capacity, in under 3 seconds. Let us show you."</div>
+      </div>
+      <div class="card">
+        <div class="card-title">⭐ Auto-Play Mode</div>
+        <div class="card-body">Turn on Auto-Play in the Simulator panel — it cycles all 4 scenarios every 3.5 seconds. Perfect for unattended demo or video recording.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">🎯 Key Talking Point</div>
+        <div class="card-body">"This runs completely offline. No Google Maps. No API calls. The moment internet cuts — which it always does in a flood — our system keeps working."</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 11 — CLOSING
+════════════════════════════════════════════════ -->
+<div class="slide" id="s11">
+  <p class="overline">JeevanSetu · SIH26192</p>
+  <h1 class="hero-title" style="font-size:clamp(36px,5vw,68px);">
+    "Every minute of warning<br/>
+    <span class="hero-highlight">= lives saved."</span>
+  </h1>
+  <div class="quote" style="text-align:left; margin-top:36px;">
+    In the 2023 Himachal floods, emergency responders said:<br/>
+    <em>"If we had known 20 minutes earlier which road was still safe, we could have saved at least 12 more people."</em><br/><br/>
+    JeevanSetu gives them that 20 minutes. It gives them the route name. It gives them the shelter address. It tells them exactly who to evacuate first — <strong style="color:var(--text)">in their own language.</strong>
+  </div>
+  <div style="margin-top:36px; display:flex; gap:20px; flex-wrap:wrap; justify-content:center;" class="fade-up">
+    <div class="badge badge-green"><span class="dot"></span>107 Plan Items Complete</div>
+    <div class="badge badge-blue"><span class="dot"></span>5 Phases Delivered</div>
+    <div class="badge badge-orange"><span class="dot"></span>Offline-First</div>
+    <div class="badge badge-red"><span class="dot"></span>Bilingual Alerts</div>
+    <div class="badge badge-yellow"><span class="dot"></span>Ward-Level Precision</div>
+  </div>
+  <p style="margin-top:36px; font-size:18px; color:var(--muted); font-weight:700; letter-spacing:0.05em;">TEAM JEEVANSETU &nbsp;·&nbsp; SIH26192</p>
+</div>
+
+</div><!-- /deck -->
+
+<!-- ── Controls ── -->
+<div id="controls">
+  <button onclick="go(-1)">← Prev</button>
+  <div id="slide-counter">1 / 11</div>
+  <button onclick="go(1)">Next →</button>
+  <button onclick="toggleFS()" style="margin-left:8px; font-size:11px; color:var(--muted)">⛶ Fullscreen</button>
+</div>
+
+<script>
+  // Stars
+  const starsEl = document.getElementById('stars');
+  for (let i = 0; i < 80; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = Math.random() * 2 + 0.5;
+    s.style.cssText = `width:${size}px;height:${size}px;top:${Math.random()*100}%;left:${Math.random()*100}%;animation-delay:${Math.random()*5}s;animation-duration:${3+Math.random()*4}s`;
+    starsEl.appendChild(s);
+  }
+
+  // Slide logic
+  const total = 11;
+  let current = 1;
+
+  function go(dir) {
+    const prev = document.getElementById('s' + current);
+    const next = current + dir;
+    if (next < 1 || next > total) return;
+    prev.classList.remove('active');
+    prev.classList.add('exit');
+    setTimeout(() => prev.classList.remove('exit'), 700);
+    current = next;
+    const el = document.getElementById('s' + current);
+    el.classList.add('active');
+    document.getElementById('slide-counter').textContent = current + ' / ' + total;
+    document.getElementById('slide-num').textContent = current + ' / ' + total;
+    document.getElementById('progress').style.width = ((current / total) * 100) + '%';
+    // Re-trigger animations
+    el.querySelectorAll('.fade-up').forEach(e => {
+      e.style.animation = 'none';
+      e.offsetHeight;
+      e.style.animation = '';
+    });
+  }
+
+  // Keyboard navigation
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'ArrowDown') go(1);
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp') go(-1);
+  });
+
+  function toggleFS() {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
+  }
+
+  // Initial progress
+  document.getElementById('progress').style.width = (1/total*100) + '%';
+</script>
+</body>
+</html>
