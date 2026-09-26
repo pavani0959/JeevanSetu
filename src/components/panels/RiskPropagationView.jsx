@@ -1,152 +1,105 @@
-/**
- * RiskPropagationView — upstream → downstream flow diagram
- * Shows how Ward 1 cloudburst triggers Ward 3/4 flood risk
- * Highlights wards in propagation order at CRITICAL
- */
-
-const NODES = [
-  { id: 'W1', label: 'Ward 1', sub: 'Upper Jeevanpur', icon: '⛰️', role: 'source',  x: 60  },
-  { id: 'W3', label: 'Ward 3', sub: 'Riverside Block',  icon: '🌊', role: 'mid',     x: 200 },
-  { id: 'W4', label: 'Ward 4', sub: 'Nala Basin',       icon: '⚠️', role: 'danger',  x: 340 },
+const CASCADE_NODES = [
+  { id: 'W1', name: 'Ward 1', role: 'Cloudburst Source', elev: '1,650m', delay: 'T+0 Min', desc: 'Rainfall runoff originates at high ridge', iconColor: '#eab308' },
+  { id: 'W2', name: 'Ward 2', role: 'West Slope Tributary', elev: '1,320m', delay: 'T+8 Min', desc: 'Soil saturation reached 78%', iconColor: '#f97316' },
+  { id: 'W3', name: 'Ward 3', role: 'East River Junction', elev: '980m', delay: 'T+18 Min', desc: 'Stream overflow & bridge closure risk', iconColor: '#f97316' },
+  { id: 'W4', name: 'Ward 4', role: 'Nala Basin Vulnerability', elev: '820m', delay: 'T+25 Min', desc: 'High-density ravine inundation zone', iconColor: '#ef4444' },
+  { id: 'W5', name: 'Ward 5', role: 'Valley Safe Shelter Hub', elev: '790m', delay: 'T+35 Min', desc: 'Hilltop School evacuation destination', iconColor: '#22c55e' },
 ];
 
-const WARD_RISK_SCORES = {
-  NORMAL:   { W1: 8,  W3: 15, W4: 18 },
-  WATCH:    { W1: 22, W3: 35, W4: 39 },
-  WARNING:  { W1: 38, W3: 58, W4: 64 },
-  CRITICAL: { W1: 54, W3: 76, W4: 84 },
+const WARD_CASCADE_SCORES = {
+  NORMAL:   { W1: 12, W2: 15, W3: 18, W4: 20, W5: 10 },
+  WATCH:    { W1: 32, W2: 38, W3: 42, W4: 48, W5: 15 },
+  WARNING:  { W1: 58, W2: 64, W3: 72, W4: 78, W5: 25 },
+  CRITICAL: { W1: 82, W2: 88, W3: 94, W4: 98, W5: 35 },
 };
 
-function nodeColor(role, scenarioKey) {
-  if (scenarioKey === 'CRITICAL') {
-    if (role === 'danger')  return '#ef4444';
-    if (role === 'mid')     return '#f97316';
-    if (role === 'source')  return '#eab308';
-  }
-  if (scenarioKey === 'WARNING') {
-    if (role === 'danger') return '#ef4444';
-    if (role === 'mid')    return '#f97316';
-    return '#eab308';
-  }
-  if (scenarioKey === 'WATCH')  return '#eab308';
-  return '#22c55e';
-}
-
 export default function RiskPropagationView({ scenarioKey }) {
+  const scores = WARD_CASCADE_SCORES[scenarioKey] || WARD_CASCADE_SCORES.NORMAL;
   const isCritical = scenarioKey === 'CRITICAL';
   const isWarning  = scenarioKey === 'WARNING' || isCritical;
-  const scores     = WARD_RISK_SCORES[scenarioKey];
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-      {/* Annotation */}
-      <div style={{ fontSize: '10px', color: 'var(--color-muted)', fontStyle: 'italic', textAlign: 'center' }}>
-        "Upstream cloudburst → downstream flood risk"
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', width: '100%' }}>
+      {/* Title subtitle */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <span style={{ fontSize: '11px', color: 'var(--color-muted-bright)', fontWeight: 700 }}>
+          Upstream Runoff to Downstream Surge Cascade
+        </span>
+        <span style={{
+          fontSize: '10px', padding: '2px 8px', borderRadius: '4px',
+          background: isCritical ? 'rgba(239,68,68,0.2)' : isWarning ? 'rgba(249,115,22,0.2)' : 'rgba(34,197,94,0.15)',
+          color: isCritical ? '#ef4444' : isWarning ? '#f97316' : '#22c55e',
+          fontWeight: 800,
+        }}>
+          {isCritical ? 'CRITICAL SURGE' : isWarning ? 'WARNING SURGE' : 'STABLE FLOW'}
+        </span>
       </div>
 
-      {/* Flow diagram */}
-      <div style={{ position: 'relative', height: '110px', userSelect: 'none' }}>
-        <svg viewBox="0 0 420 110" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
-          <defs>
-            <marker id="prop-arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
-              <polygon points="0 0, 8 3, 0 6" fill="rgba(255,255,255,0.25)" />
-            </marker>
-            <marker id="prop-arrow-active" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
-              <polygon points="0 0, 8 3, 0 6" fill="#f97316" />
-            </marker>
-            <filter id="node-glow">
-              <feGaussianBlur stdDeviation="3" result="blur"/>
-              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-            </filter>
-          </defs>
+      {/* Expanded Vertical / Horizontal Flow Sequence */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        {CASCADE_NODES.map((node, i) => {
+          const score = scores[node.id];
+          const nodeColor = score >= 75 ? '#ef4444' : score >= 50 ? '#f97316' : score >= 30 ? '#eab308' : '#22c55e';
+          const nodeBg = score >= 75 ? 'rgba(239,68,68,0.1)' : score >= 50 ? 'rgba(249,115,22,0.1)' : score >= 30 ? 'rgba(234,179,8,0.1)' : 'rgba(34,197,94,0.08)';
 
-          {/* Connection arrows */}
-          {/* W1 → W3 */}
-          <line x1="118" y1="55" x2="162" y2="55"
-            stroke={isWarning ? '#f97316' : 'rgba(255,255,255,0.12)'}
-            strokeWidth={isWarning ? 2.5 : 1.5}
-            strokeDasharray={isWarning ? '0' : '4 3'}
-            markerEnd={isWarning ? 'url(#prop-arrow-active)' : 'url(#prop-arrow)'}
-            style={{ transition: 'all 0.5s' }}
-          />
-          {/* W3 → W4 */}
-          <line x1="258" y1="55" x2="302" y2="55"
-            stroke={isCritical ? '#ef4444' : isWarning ? '#f97316' : 'rgba(255,255,255,0.12)'}
-            strokeWidth={isCritical ? 3 : isWarning ? 2 : 1.5}
-            strokeDasharray={isCritical || isWarning ? '0' : '4 3'}
-            markerEnd={isCritical ? 'url(#prop-arrow-active)' : isWarning ? 'url(#prop-arrow-active)' : 'url(#prop-arrow)'}
-            style={{ transition: 'all 0.5s' }}
-          />
+          return (
+            <div key={node.id} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '10px 12px',
+                  borderRadius: '8px',
+                  background: nodeBg,
+                  border: `1px solid ${nodeColor}33`,
+                  transition: 'all 0.3s ease',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <span style={{
+                    width: 24, height: 24, borderRadius: '50%', background: nodeColor,
+                    color: '#0a0f1e', fontWeight: 900, fontSize: '11px',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    boxShadow: `0 0 8px ${nodeColor}66`,
+                  }}>
+                    {node.id}
+                  </span>
+                  <div>
+                    <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text)' }}>
+                      {node.name} <span style={{ fontSize: '10px', color: 'var(--color-muted)', fontWeight: 400 }}>({node.elev})</span>
+                    </div>
+                    <div style={{ fontSize: '10px', color: 'var(--color-muted-bright)' }}>
+                      {node.role} — {node.desc}
+                    </div>
+                  </div>
+                </div>
 
-          {/* Arrow labels */}
-          {isWarning && (
-            <text x="140" y="48" textAnchor="middle" fill="#f97316" fontSize="7" fontFamily="Inter">
-              rising
-            </text>
-          )}
-          {isCritical && (
-            <text x="280" y="48" textAnchor="middle" fill="#ef4444" fontSize="7" fontFamily="Inter">
-              ⚡ surge
-            </text>
-          )}
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontSize: '14px', fontWeight: 900, color: nodeColor, fontVariantNumeric: 'tabular-nums' }}>
+                    {score}/100
+                  </div>
+                  <div style={{ fontSize: '9px', color: 'var(--color-muted)', fontWeight: 600 }}>
+                    {node.delay}
+                  </div>
+                </div>
+              </div>
 
-          {/* Nodes */}
-          {NODES.map((node, i) => {
-            const color    = nodeColor(node.role, scenarioKey);
-            const score    = scores[node.id];
-            const animated = isCritical && node.role === 'danger';
-            const cx       = node.x + 30;
-
-            return (
-              <g key={node.id}>
-                {/* Glow ring at CRITICAL */}
-                {animated && (
-                  <circle cx={cx} cy={55} r={34}
-                    fill="none" stroke="#ef444444" strokeWidth="2"
-                    style={{ animation: 'wardPulse 1.5s ease-in-out infinite' }}
-                  />
-                )}
-                {/* Node circle */}
-                <circle
-                  cx={cx} cy={55} r={28}
-                  fill={`${color}22`}
-                  stroke={color}
-                  strokeWidth={animated ? 2.5 : 1.5}
-                  style={{
-                    transition: 'all 0.5s',
-                    filter: animated ? 'url(#node-glow)' : 'none',
-                  }}
-                />
-                {/* Icon */}
-                <text x={cx} y={47} textAnchor="middle" fontSize="14">{node.icon}</text>
-                {/* Score */}
-                <text x={cx} y={62} textAnchor="middle" fontSize="10" fontWeight="800"
-                  fill={color} fontFamily="Inter" style={{ transition: 'fill 0.5s' }}>
-                  {score}
-                </text>
-                {/* Ward label */}
-                <text x={cx} y={92} textAnchor="middle" fontSize="8.5" fill="rgba(255,255,255,0.75)" fontFamily="Inter" fontWeight="600">
-                  {node.label}
-                </text>
-                <text x={cx} y={103} textAnchor="middle" fontSize="7.5" fill="rgba(255,255,255,0.4)" fontFamily="Inter">
-                  {node.sub}
-                </text>
-              </g>
-            );
-          })}
-
-          {/* Source label */}
-          <text x="90" y="16" textAnchor="middle" fontSize="8" fill="#eab308" fontWeight="700" fontFamily="Inter">
-            CLOUDBURST↓
-          </text>
-        </svg>
-      </div>
-
-      {/* Phase labels */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '9px', color: 'var(--color-muted)' }}>
-        <span>1. Rainfall source</span>
-        <span>2. Stream rises</span>
-        <span>3. ⚠️ Flash flood risk</span>
+              {/* Flow connector line between nodes */}
+              {i < CASCADE_NODES.length - 1 && (
+                <div style={{ display: 'flex', alignItems: 'center', paddingLeft: '22px', gap: '8px' }}>
+                  <div style={{
+                    width: '2px', height: '14px',
+                    background: isWarning ? `linear-gradient(180deg, ${nodeColor}, #60a5fa)` : 'rgba(255,255,255,0.1)',
+                  }} />
+                  <span style={{ fontSize: '9px', color: 'var(--color-muted)', fontStyle: 'italic' }}>
+                    {isCritical ? 'High Volume Surface Water Flow' : 'Normal Natural Drainage'}
+                  </span>
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );

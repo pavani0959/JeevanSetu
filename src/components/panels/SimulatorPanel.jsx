@@ -1,15 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 
-/**
- * SimulatorPanel — 4 scenario buttons + auto-play + rainfall slider + offline toggle
- * Replaces the temporary scenario switcher from Phase 3
- */
-
 const SCENARIOS = [
-  { key: 'NORMAL',   label: 'NORMAL',       sub: '12 mm/hr', color: '#22c55e', emoji: '🌤️' },
-  { key: 'WATCH',    label: 'WATCH',        sub: '42 mm/hr', color: '#eab308', emoji: '🌦️' },
-  { key: 'WARNING',  label: 'WARNING',      sub: '78 mm/hr', color: '#f97316', emoji: '⛈️' },
-  { key: 'CRITICAL', label: 'CLOUDBURST',   sub: '126 mm/hr', color: '#ef4444', emoji: '🌪️' },
+  { key: 'NORMAL',   labelEn: 'NORMAL',   labelHi: 'सामान्य (Normal)',      sub: '12 mm/hr', color: '#22c55e' },
+  { key: 'WATCH',    labelEn: 'WATCH',    labelHi: 'सतर्कता (Watch)',       sub: '42 mm/hr', color: '#eab308' },
+  { key: 'WARNING',  labelEn: 'WARNING',  labelHi: 'चेतावनी (Warning)',     sub: '78 mm/hr', color: '#f97316' },
+  { key: 'CRITICAL', labelEn: 'CLOUDBURST', labelHi: 'खतरा (Cloudburst)',   sub: '126 mm/hr', color: '#ef4444' },
 ];
 
 export default function SimulatorPanel({
@@ -21,12 +16,12 @@ export default function SimulatorPanel({
   setRainfallOverride,
   isOffline,
   toggleDemoOffline,
+  isHindi,
 }) {
   const autoRef = useRef(null);
   const [sliderVal, setSliderVal] = useState(rainfallOverride ?? 12);
   const [showSlider, setShowSlider] = useState(false);
 
-  // Auto-play: cycle through 4 scenarios every 3.5s
   useEffect(() => {
     if (!isAutoPlay) {
       if (autoRef.current) clearInterval(autoRef.current);
@@ -51,8 +46,8 @@ export default function SimulatorPanel({
     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
 
       {/* Section label */}
-      <div style={{ fontSize: '9px', color: 'var(--color-muted)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-        Cloudburst Simulator
+      <div style={{ fontSize: '10px', color: 'var(--color-muted-bright)', fontWeight: 700, letterSpacing: '0.04em' }}>
+        {isHindi ? 'मौसम एवं परिस्थिति नियंत्रण' : 'Simulate Flood Conditions'}
       </div>
 
       {/* 4 scenario buttons */}
@@ -66,8 +61,8 @@ export default function SimulatorPanel({
               onClick={() => { setIsAutoPlay(false); setScenario(s.key); }}
               style={{
                 padding: '10px 14px',
-                borderRadius: '10px',
-                border: `2px solid ${isActive ? s.color : 'var(--color-border)'}`,
+                borderRadius: '8px',
+                border: `1.5px solid ${isActive ? s.color : 'var(--color-border)'}`,
                 background: isActive
                   ? `linear-gradient(135deg, ${s.color}22, ${s.color}0a)`
                   : 'rgba(255,255,255,0.02)',
@@ -79,20 +74,28 @@ export default function SimulatorPanel({
                 fontFamily: 'Inter, sans-serif',
                 transition: 'all 0.25s ease',
                 boxShadow: isActive
-                  ? `0 0 18px ${s.color}40, inset 0 0 20px ${s.color}08`
+                  ? `0 0 16px ${s.color}35, inset 0 0 12px ${s.color}08`
                   : 'none',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '10px',
               }}
             >
-              <span style={{ fontSize: '18px', flexShrink: 0 }}>{s.emoji}</span>
+              <span
+                style={{
+                  width: 10,
+                  height: 10,
+                  borderRadius: '50%',
+                  background: s.color,
+                  boxShadow: isActive ? `0 0 8px ${s.color}` : 'none',
+                  flexShrink: 0,
+                }}
+              />
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                  <span>{s.label}</span>
-                  <span style={{ fontSize: '11px', fontWeight: 400, opacity: 0.7 }}>{s.sub}</span>
+                  <span>{isHindi ? s.labelHi : s.labelEn}</span>
+                  <span style={{ fontSize: '11px', fontWeight: 500, opacity: 0.8 }}>{s.sub}</span>
                 </div>
-                {/* Active glow bar */}
                 {isActive && (
                   <div style={{
                     height: '2px',
@@ -121,10 +124,10 @@ export default function SimulatorPanel({
       }}>
         <div>
           <div style={{ fontSize: '12px', fontWeight: 700, color: isAutoPlay ? '#60a5fa' : 'var(--color-muted-bright)' }}>
-            ▶ Auto-Play
+            {isHindi ? 'स्वचालित बदलाव (Auto Cycle)' : 'Auto-Play Cycle'}
           </div>
           <div style={{ fontSize: '9px', color: 'var(--color-muted)', marginTop: '1px' }}>
-            Cycles every 3.5s — for video recording
+            {isHindi ? 'हर 3.5 सेकंड में अपने आप बदलेगा' : 'Cycles every 3.5s automatically'}
           </div>
         </div>
         <button
@@ -157,9 +160,9 @@ export default function SimulatorPanel({
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
           <div>
             <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-muted-bright)' }}>
-              🌧 Rainfall Override
+              {isHindi ? 'बारिश की मात्रा (Rainfall Slider)' : 'Rainfall Control'}
             </div>
-            <div style={{ fontSize: '9px', color: 'var(--color-muted)' }}>12–150 mm/hr manual control</div>
+            <div style={{ fontSize: '9px', color: 'var(--color-muted)' }}>12–150 mm/hr</div>
           </div>
           <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
             <span style={{
@@ -177,7 +180,7 @@ export default function SimulatorPanel({
             ) : (
               <button onClick={() => setShowSlider(true)}
                 style={{ background: 'none', border: `1px solid var(--color-border)`, color: 'var(--color-muted)', cursor: 'pointer', fontSize: '10px', padding: '2px 7px', borderRadius: '4px', fontFamily: 'Inter' }}>
-                Edit
+                {isHindi ? 'बदलें' : 'Edit'}
               </button>
             )}
           </div>
@@ -201,18 +204,6 @@ export default function SimulatorPanel({
             }}
           />
         )}
-
-        {/* Tick labels */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '4px' }}>
-          {[
-            { val: 12, label: 'Normal' },
-            { val: 42, label: 'Watch' },
-            { val: 78, label: 'Warn' },
-            { val: 126, label: 'Critical' },
-          ].map(t => (
-            <span key={t.val} style={{ fontSize: '8px', color: 'var(--color-muted)' }}>{t.label}</span>
-          ))}
-        </div>
       </div>
 
       {/* Offline toggle */}
@@ -228,10 +219,10 @@ export default function SimulatorPanel({
       }}>
         <div>
           <div style={{ fontSize: '12px', fontWeight: 700, color: isOffline ? '#60a5fa' : 'var(--color-muted-bright)' }}>
-            📶 Simulate Offline
+            {isHindi ? 'ऑफ़लाइन मोड (Offline Mode)' : 'Offline Operation Mode'}
           </div>
           <div style={{ fontSize: '9px', color: 'var(--color-muted)', marginTop: '1px' }}>
-            Cached SVG map — no tile dependency
+            {isHindi ? 'लोकल कैश मैप का उपयोग' : 'Cached vector map enabled'}
           </div>
         </div>
         <button
@@ -253,13 +244,6 @@ export default function SimulatorPanel({
           {isOffline ? 'ON' : 'OFF'}
         </button>
       </div>
-
-      <style>{`
-        @keyframes shimmer {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.4; }
-        }
-      `}</style>
     </div>
   );
 }

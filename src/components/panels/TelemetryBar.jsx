@@ -1,19 +1,17 @@
-import { useEffect, useRef } from 'react';
-import { SCENARIOS } from '../../data/scenarios';
-import { MICRO_TREND, getTrendArrow, getTrendColor } from '../../data/microTrend';
+import { MICRO_TREND, getTrendColor } from '../../data/microTrend';
 
 /**
  * TelemetryBar — live sensor readings strip
  * Shows: Rainfall | Soil Saturation | Stream Level | Risk Score
- * Each value coloured by severity, with trend arrows from microTrend
+ * Professional text and badge indicators (no informal emojis)
  */
-export default function TelemetryBar({ scenarioKey, liveRainfall, liveSoil, liveStream, riskScore, riskState }) {
+export default function TelemetryBar({ scenarioKey, liveRainfall, liveSoil, liveStream, riskScore, riskState, isHindi }) {
   const trend = MICRO_TREND[scenarioKey];
 
   const readings = [
     {
       id: 'rainfall',
-      label: '🌧 Rainfall',
+      label: isHindi ? 'बारिश (Rainfall)' : 'Rainfall Rate',
       value: liveRainfall.toFixed(1),
       unit: 'mm/hr',
       max: 150,
@@ -23,7 +21,7 @@ export default function TelemetryBar({ scenarioKey, liveRainfall, liveSoil, live
     },
     {
       id: 'soil',
-      label: '💧 Soil Sat.',
+      label: isHindi ? 'मिट्टी में नमी (Soil Moisture)' : 'Soil Saturation',
       value: liveSoil.toFixed(0),
       unit: '%',
       max: 100,
@@ -33,7 +31,7 @@ export default function TelemetryBar({ scenarioKey, liveRainfall, liveSoil, live
     },
     {
       id: 'stream',
-      label: '🌊 Stream',
+      label: isHindi ? 'नदी/नाले का जलस्तर (River Stream)' : 'River Stream Level',
       value: liveStream.toFixed(1),
       unit: 'm',
       max: 5,
@@ -43,11 +41,11 @@ export default function TelemetryBar({ scenarioKey, liveRainfall, liveSoil, live
     },
     {
       id: 'risk',
-      label: '⚠️ Risk Score',
+      label: isHindi ? 'खतरे का स्तर (Risk Score)' : 'Flood Risk Score',
       value: riskScore,
       unit: '/ 100',
       max: 100,
-      trend: trend.direction.rainfall, // use same direction as rainfall
+      trend: trend.direction.rainfall,
       trendLabel: null,
       color:
         riskState === 'CRITICAL' ? '#ef4444' :
@@ -62,40 +60,39 @@ export default function TelemetryBar({ scenarioKey, liveRainfall, liveSoil, live
         display: 'flex',
         gap: '0',
         alignItems: 'stretch',
-        flexWrap: 'nowrap',
+        flexWrap: 'wrap',
         overflow: 'hidden',
       }}
     >
       {readings.map((r, i) => (
-        <TelemetryItem key={r.id} item={r} last={i === readings.length - 1} scenarioKey={scenarioKey} />
+        <TelemetryItem key={r.id} item={r} last={i === readings.length - 1} />
       ))}
     </div>
   );
 }
 
-function TelemetryItem({ item, last, scenarioKey }) {
+function TelemetryItem({ item, last }) {
   const arrowColor = getTrendColor(item.trend);
-  const arrow = getTrendArrow(item.trend);
 
   return (
     <div style={{
-      flex: 1,
-      padding: '10px 16px',
+      flex: '1 1 200px',
+      padding: '12px 18px',
       borderRight: last ? 'none' : '1px solid rgba(255,255,255,0.06)',
       display: 'flex',
       flexDirection: 'column',
       gap: '4px',
     }}>
       {/* Label */}
-      <div style={{ fontSize: '10px', color: 'var(--color-muted)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+      <div style={{ fontSize: '11px', color: 'var(--color-muted-bright)', fontWeight: 700, letterSpacing: '0.04em' }}>
         {item.label}
       </div>
 
       {/* Value + trend arrow */}
       <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
         <span style={{
-          fontSize: '22px',
-          fontWeight: 800,
+          fontSize: '24px',
+          fontWeight: 900,
           color: item.color,
           fontVariantNumeric: 'tabular-nums',
           transition: 'color 0.5s ease',
@@ -103,7 +100,7 @@ function TelemetryItem({ item, last, scenarioKey }) {
         }}>
           {item.value}
         </span>
-        <span style={{ fontSize: '11px', color: 'var(--color-muted)', fontWeight: 400 }}>
+        <span style={{ fontSize: '11px', color: 'var(--color-muted)', fontWeight: 500 }}>
           {item.unit}
         </span>
         {item.trendLabel && (
@@ -112,7 +109,6 @@ function TelemetryItem({ item, last, scenarioKey }) {
             fontWeight: 700,
             color: arrowColor,
             marginLeft: '4px',
-            transition: 'color 0.4s',
           }}>
             {item.trendLabel}
           </span>
@@ -121,11 +117,11 @@ function TelemetryItem({ item, last, scenarioKey }) {
 
       {/* Mini progress bar */}
       <div style={{
-        height: '3px',
+        height: '4px',
         background: 'rgba(255,255,255,0.07)',
         borderRadius: '2px',
         overflow: 'hidden',
-        marginTop: '2px',
+        marginTop: '4px',
       }}>
         <div style={{
           height: '100%',
@@ -139,7 +135,6 @@ function TelemetryItem({ item, last, scenarioKey }) {
   );
 }
 
-/** Returns colour based on thresholds (green/yellow/orange/red) */
 function severityColor(val, watchT, warnT, critT) {
   if (val >= critT)  return '#ef4444';
   if (val >= warnT)  return '#f97316';

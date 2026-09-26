@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react';
 
 // Layout
 import NavBar              from '../components/shared/NavBar';
-import DemoModeBanner      from '../components/shared/DemoModeBanner';
 import OfflineBanner       from '../components/shared/OfflineBanner';
 import RainCanvas          from '../components/shared/RainCanvas';
 import Card                from '../components/shared/Card';
+import Footer              from '../components/shared/Footer';
 
 // Hooks
 import { useScenario }     from '../hooks/useScenario';
@@ -26,13 +26,21 @@ import PriorityPanel       from '../components/panels/PriorityPanel';
 import AlertPanel          from '../components/alerts/AlertPanel';
 import AlertFeed           from '../components/alerts/AlertFeed';
 
-// Phase 5 — Simulator & Polish
-import SimulatorPanel      from '../components/panels/SimulatorPanel';
-import RiskPropagationView from '../components/panels/RiskPropagationView';
+// Village Quick Guide & Extended Content — Simulator, Matrix Tables & SOPs
+import VillageQuickGuide      from '../components/panels/VillageQuickGuide';
+import SimulatorPanel         from '../components/panels/SimulatorPanel';
+import RiskPropagationView    from '../components/panels/RiskPropagationView';
+import SensorNetworkTable     from '../components/panels/SensorNetworkTable';
+import WardRiskMatrixTable    from '../components/panels/WardRiskMatrixTable';
+import EmergencySOPGuide      from '../components/panels/EmergencySOPGuide';
+import ControlCenterDirectory from '../components/panels/ControlCenterDirectory';
 
 export default function Dashboard() {
   const scenarioCtx  = useScenario();
   const connectivity = useConnectivity();
+
+  // Language state (defaults to Hindi bilingual mode for rural intuitiveness)
+  const [isHindi, setIsHindi] = useState(true);
 
   const {
     scenarioKey, setScenario,
@@ -61,7 +69,7 @@ export default function Dashboard() {
 
   useEffect(() => { runSelfTest(); }, []);
 
-  // Rainfall override for slider (passed into SimulatorPanel)
+  // Rainfall override for slider
   const [rainfallOverride, setLocalRainfallOverride] = useState(null);
   const handleRainfallOverride = (val) => {
     setLocalRainfallOverride(val);
@@ -71,21 +79,29 @@ export default function Dashboard() {
   const rainIntensity = riskState === 'CRITICAL' ? 2.8 : riskState === 'WARNING' ? 2.0 : riskState === 'WATCH' ? 1.4 : 1.0;
 
   return (
-    /* Add state class to root so CSS can apply CRITICAL edge glow */
     <div className={`state-${riskState.toLowerCase()}`}>
       <div className="app-wrapper">
-        {/* Animated rain — intensity scales with risk */}
+        {/* Animated rain background */}
         <RainCanvas intensity={rainIntensity} />
 
-        {/* Persistent banners */}
-        <DemoModeBanner />
+        {/* Floating offline indicator */}
         <OfflineBanner visible={isOffline} />
 
-        {/* Top navigation */}
-        <NavBar riskState={riskState} currentTime={currentTime} />
+        {/* Top sticky navigation bar */}
+        <NavBar
+          riskState={riskState}
+          currentTime={currentTime}
+          isHindi={isHindi}
+          setIsHindi={setIsHindi}
+        />
 
-        {/* ── TELEMETRY BAR ──────────────────────────────────── */}
-        <div style={{ padding: '10px 16px 0', maxWidth: '1920px', margin: '0 auto', width: '100%' }}>
+        {/* ── VILLAGE INTUITIVE QUICK GUIDE — 3-Second Action Banner ── */}
+        <div style={{ padding: '16px 20px 0', maxWidth: '1920px', margin: '0 auto', width: '100%' }}>
+          <VillageQuickGuide scenarioKey={scenarioKey} isHindi={isHindi} />
+        </div>
+
+        {/* ── TELEMETRY STRIP ──────────────────────────────────── */}
+        <div style={{ padding: '16px 20px 0', maxWidth: '1920px', margin: '0 auto', width: '100%' }}>
           <Card noPad>
             <TelemetryBar
               scenarioKey={scenarioKey}
@@ -94,6 +110,7 @@ export default function Dashboard() {
               liveStream={liveStream}
               riskScore={riskScore}
               riskState={riskState}
+              isHindi={isHindi}
             />
           </Card>
         </div>
@@ -101,9 +118,9 @@ export default function Dashboard() {
         {/* ── MAIN 3-COLUMN GRID ─────────────────────────────── */}
         <main style={{
           display: 'grid',
-          gridTemplateColumns: '276px 1fr 296px',
-          gap: '10px',
-          padding: '10px 16px',
+          gridTemplateColumns: '300px 1fr 310px',
+          gap: '16px',
+          padding: '16px 20px',
           maxWidth: '1920px',
           margin: '0 auto',
           width: '100%',
@@ -111,10 +128,10 @@ export default function Dashboard() {
         }}>
 
           {/* ── LEFT SIDEBAR ──────────────────────────────────── */}
-          <aside style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <aside style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
-            {/* Simulator Panel — Phase 5 (replaces temp buttons) */}
-            <Card title="Cloudburst Simulator">
+            {/* Cloudburst Scenario Simulator */}
+            <Card title={isHindi ? "मौसम एवं परिस्थिति नियंत्रण" : "Cloudburst Scenario Controls"}>
               <SimulatorPanel
                 scenarioKey={scenarioKey}
                 setScenario={setScenario}
@@ -124,16 +141,17 @@ export default function Dashboard() {
                 setRainfallOverride={handleRainfallOverride}
                 isOffline={isOffline}
                 toggleDemoOffline={toggleDemoOffline}
+                isHindi={isHindi}
               />
             </Card>
 
             {/* Risk Propagation */}
-            <Card title="Risk Propagation">
+            <Card title={isHindi ? "खतरे का बहाव (Cascade Risk)" : "Cascade Risk Flow"}>
               <RiskPropagationView scenarioKey={scenarioKey} />
             </Card>
 
             {/* Ward Info Panel */}
-            <Card title="Ward Details" style={{ flex: 1 }}>
+            <Card title={isHindi ? "चुने गए वार्ड की जानकारी" : "Active Ward Details"} style={{ flex: 1 }}>
               <WardInfoPanel
                 selectedWardId={selectedWardId}
                 scenarioKey={scenarioKey}
@@ -142,13 +160,13 @@ export default function Dashboard() {
             </Card>
           </aside>
 
-          {/* ── CENTRE — Map + Alert ──────────────────────────── */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          {/* ── CENTRE — Map + Emergency Alert ──────────────────── */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <Card
-              title="Ward Risk Map — Jeevanpur Valley"
+              title={isHindi ? "जीवनपुर घाटी — वार्ड और खतरे का नक्शा" : "Ward Risk Map — Jeevanpur Valley Basin"}
               titleRight={
-                <span style={{ fontSize: '10px', color: 'var(--color-muted)' }}>
-                  Click ward · Hover for details
+                <span style={{ fontSize: '11px', color: 'var(--color-muted-bright)' }}>
+                  {isHindi ? "नक्शे पर किसी भी वार्ड को दबाएँ" : "Interactive Terrain · Click ward to inspect"}
                 </span>
               }
               style={{ flex: 1 }}
@@ -160,50 +178,105 @@ export default function Dashboard() {
               />
             </Card>
 
-            {/* Emergency Alert below map */}
-            <Card title="🚨 Emergency Alert">
+            {/* Emergency Broadcast Alert below map */}
+            <Card title={isHindi ? "आपातकालीन सूचना (Emergency Broadcast)" : "Emergency Broadcast Alert"}>
               <AlertPanel scenarioKey={scenarioKey} />
             </Card>
           </div>
 
           {/* ── RIGHT SIDEBAR ─────────────────────────────────── */}
-          <aside style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <aside style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
-            <Card title="Risk Score — Ward 4">
+            <Card title={isHindi ? "वार्ड 4 — खतरे का स्कोर" : "Risk Score Analytics — Ward 4"}>
               <RiskScorePanel riskResult={riskResult} scenarioKey={scenarioKey} />
             </Card>
 
-            <Card title="Last 30 Min — Rate of Change">
+            <Card title={isHindi ? "पिछले 30 मिनट में बदलाव" : "30-Min Telemetry Rate of Change"}>
               <MicroTrendPanel scenarioKey={scenarioKey} />
             </Card>
 
-            <Card title="Evacuation">
+            <Card title={isHindi ? "निकासी रास्ता (Safe Evacuation Path)" : "Evacuation Route Status"}>
               <EvacuationPanel scenarioKey={scenarioKey} />
             </Card>
 
-            <Card title="Shelter Status">
+            <Card title={isHindi ? "सुरक्षित आश्रय (Hilltop Shelter)" : "Hilltop Shelter Capacity"}>
               <ShelterCard scenarioKey={scenarioKey} />
             </Card>
           </aside>
         </main>
 
-        {/* ── BOTTOM ROW — Priority + Alert Feed ───────────── */}
+        {/* ── SECTION 2 — Priority Assistance & Response Timeline ── */}
         <section style={{
           display: 'grid',
           gridTemplateColumns: '1fr 1fr',
-          gap: '10px',
-          padding: '0 16px 18px',
+          gap: '16px',
+          padding: '0 20px 16px',
           maxWidth: '1920px',
           margin: '0 auto',
           width: '100%',
         }}>
-          <Card title="Priority Assistance">
+          <Card title={isHindi ? "बुजुर्ग और विशेष सहायता (Priority Assistance)" : "Vulnerable Population Priority Assistance"}>
             <PriorityPanel scenarioKey={scenarioKey} />
           </Card>
-          <Card title="Alert Feed — Response Timeline">
+          <Card title={isHindi ? "राहत एवं बचाव की समयरेखा" : "Incident Alert & Response Timeline"}>
             <AlertFeed scenarioKey={scenarioKey} />
           </Card>
         </section>
+
+        {/* ── SECTION 3 — Field Sensor Telemetry Matrix ───────────── */}
+        <section style={{
+          padding: '0 20px 16px',
+          maxWidth: '1920px',
+          margin: '0 auto',
+          width: '100%',
+        }}>
+          <Card>
+            <SensorNetworkTable scenarioKey={scenarioKey} />
+          </Card>
+        </section>
+
+        {/* ── SECTION 4 — Ward Vulnerability & Risk Matrix ────────── */}
+        <section style={{
+          padding: '0 20px 16px',
+          maxWidth: '1920px',
+          margin: '0 auto',
+          width: '100%',
+        }}>
+          <Card>
+            <WardRiskMatrixTable
+              scenarioKey={scenarioKey}
+              onSelectWard={setSelectedWardId}
+              selectedWardId={selectedWardId}
+            />
+          </Card>
+        </section>
+
+        {/* ── SECTION 5 — Standard Operating Procedures (SOPs) ────── */}
+        <section style={{
+          padding: '0 20px 16px',
+          maxWidth: '1920px',
+          margin: '0 auto',
+          width: '100%',
+        }}>
+          <Card>
+            <EmergencySOPGuide scenarioKey={scenarioKey} />
+          </Card>
+        </section>
+
+        {/* ── SECTION 6 — Control Center & Helplines Directory ────── */}
+        <section style={{
+          padding: '0 20px',
+          maxWidth: '1920px',
+          margin: '0 auto',
+          width: '100%',
+        }}>
+          <Card>
+            <ControlCenterDirectory />
+          </Card>
+        </section>
+
+        {/* ── FOOTER ───────────────────────────────────────────── */}
+        <Footer currentTime={currentTime} />
       </div>
     </div>
   );
