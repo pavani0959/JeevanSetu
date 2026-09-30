@@ -6,6 +6,7 @@
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { calculateWardRiskScore } from '../engine/riskEngine.js';
 
 const API_BASE = 'http://localhost:8000';
 const DEBOUNCE_MS = 800; // avoid hammering API on every jitter tick
@@ -33,12 +34,12 @@ export function useMLPredict({ rainfall, soil, stream, terrain = 0.92 }) {
       setBackendOnline(true);
     } catch (err) {
       // Mock the ML model for GitHub Pages if the backend is not running
-      const { calculateRiskScore } = await import('../engine/riskEngine.js');
-      const { score, state } = calculateRiskScore(r, s, st, tv);
-      const state_code = state === 'NORMAL' ? 0 : state === 'WATCH' ? 1 : state === 'WARNING' ? 2 : 3;
-      
-      const p = { NORMAL: 0, WATCH: 0, WARNING: 0, CRITICAL: 0 };
-      p[state] = 98.3; // Fake confidence
+      try {
+        const { state } = calculateWardRiskScore({ rainfall: r, soil: s, stream: st, terrainVulnerability: tv });
+        const state_code = state === 'NORMAL' ? 0 : state === 'WATCH' ? 1 : state === 'WARNING' ? 2 : 3;
+        
+        const p = { NORMAL: 0, WATCH: 0, WARNING: 0, CRITICAL: 0 };
+        p[state] = 98.3; // Fake confidence
 
       setMlResult({
         state: state,
@@ -49,6 +50,10 @@ export function useMLPredict({ rainfall, soil, stream, terrain = 0.92 }) {
       setError(null);
       // We set it to true so the UI thinks it's online for the presentation demo
       setBackendOnline(true);
+      } catch (innerErr) {
+        console.error("Mock ML Failed", innerErr);
+        setError("Mock ML Failed");
+      }
     } finally {
       setIsLoading(false);
     }
