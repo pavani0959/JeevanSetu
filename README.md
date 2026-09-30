@@ -3,6 +3,9 @@
 
 > **Tagline:** Before the water reaches them, the warning should.
 
+🔗 **Live Demo (Frontend MVP):** [https://pavani0959.github.io/JeevanSetu/](https://pavani0959.github.io/JeevanSetu/)  
+*(Note: Because the backend ML engine requires a Python server, the live demo gracefully falls back to the Rule-Based engine if the backend is not running locally).*
+
 JeevanSetu is a hyper-local, AI-driven flash-flood decision-support system designed specifically for the unique terrain and challenges of hilly regions. It bridges the gap between broad meteorological alerts and actionable, ward-level evacuation guidance.
 
 ---
