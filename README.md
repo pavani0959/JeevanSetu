@@ -1,5 +1,8 @@
-# JeevanSetu — Flash-Flood Early Warning & Safe Evacuation System
-**Smart India Hackathon (SIH) 2026 — Problem Statement: SIH26192**
+# 🌊 JeevanSetu — Flash-Flood Early Warning & Safe Evacuation System
+
+**Smart India Hackathon (SIH) 2026 · Problem Statement: SIH26192 · Team: Innov8 Across (ID: 137715)**
+
+![SIH26192](https://img.shields.io/badge/SIH26192-Disaster%20Management-red?style=for-the-badge) ![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-blue?style=for-the-badge) ![ML Model](https://img.shields.io/badge/ML-Random%20Forest%2098.3%25-green?style=for-the-badge) ![React](https://img.shields.io/badge/React-19%20%2B%20Vite-61DAFB?style=for-the-badge&logo=react) ![FastAPI](https://img.shields.io/badge/FastAPI-Python-009688?style=for-the-badge&logo=fastapi)
 
 > **Tagline:** Before the water reaches them, the warning should.
 
@@ -38,7 +41,7 @@ JeevanSetu is not just another weather dashboard. It converts risk into immediat
 
 ---
 
-## شف System Architecture & Data Transparency
+## 🏗️ System Architecture & Data Transparency
 JeevanSetu was built to be a highly realistic Minimum Viable Product (MVP). We are completely transparent about our data sources:
 - **🟢 LIVE:** Open-Meteo API (Weather), Random Forest ML Classification Engine
 - **🟡 FUTURE:** IMD District/Basin Forecasts, CWC Stream Gauge Telemetry
@@ -52,8 +55,8 @@ JeevanSetu was built to be a highly realistic Minimum Viable Product (MVP). We a
 
 **1. Clone the repository**
 ```bash
-git clone https://github.com/your-username/jeevansetu.git
-cd jeevansetu
+git clone https://github.com/pavani0959/JeevanSetu.git
+cd JeevanSetu
 ```
 
 **2. Start the FastAPI Backend (ML Engine)**
