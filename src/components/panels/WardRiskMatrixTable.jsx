@@ -25,11 +25,11 @@ export default function WardRiskMatrixTable({ scenarioKey, onSelectWard, selecte
           <thead>
             <tr style={{ background: 'rgba(255,255,255,0.04)', color: 'var(--color-muted-bright)', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
               <th style={{ padding: '10px 12px', fontWeight: 600 }}>Ward Name</th>
-              <th style={{ padding: '10px 12px', fontWeight 600 }}>Elevation & Slope</th>
-              <th style={{ padding: '10px 12px', fontWeight 600 }}>Population & At-Risk</th>
-              <th style={{ padding: '10px 12px', fontWeight 600 }}>Risk Score</th>
-              <th style={{ padding: '10px 12px', fontWeight 600 }}>Evacuation Corridor</th>
-              <th style={{ padding: '10px 12px', fontWeight 600 }}>Assigned Response Unit</th>
+              <th style={{ padding: '10px 12px', fontWeight: 600 }}>Elevation & Slope</th>
+              <th style={{ padding: '10px 12px', fontWeight: 600 }}>Population & At-Risk</th>
+              <th style={{ padding: '10px 12px', fontWeight: 600 }}>Risk Score</th>
+              <th style={{ padding: '10px 12px', fontWeight: 600 }}>Evacuation Corridor</th>
+              <th style={{ padding: '10px 12px', fontWeight: 600 }}>Assigned Response Unit</th>
             </tr>
           </thead>
           <tbody>
