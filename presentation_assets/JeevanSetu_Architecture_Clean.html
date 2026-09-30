@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>JeevanSetu — System Architecture</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+    display: flex; justify-content: center;
+    padding: 20px;
+  }
+  .slide {
+    width: 1000px;
+    background: #fff;
+    padding: 20px 24px 24px;
+    border: 2px solid #ccc;
+  }
+
+  /* Header */
+  .header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px; }
+  .title { font-size:24px; font-weight:900; text-decoration:underline; }
+  .sih-badge { text-align:right; }
+  .sih-badge img { height: 56px; }
+  .sih-badge-text { font-size:11px; font-weight:700; line-height:1.4; border:1.5px solid #333; padding:5px 10px; }
+
+  /* Layout */
+  .body { display:flex; gap:10px; align-items:flex-start; }
+
+  /* Left column */
+  .left-col { width:130px; display:flex; flex-direction:column; align-items:center; gap:6px; padding-top:10px; }
+  .section-label { background:#e8e8e8; border:1.5px solid #000; font-size:10px; font-weight:900; text-transform:uppercase; text-align:center; padding:5px 6px; width:100%; letter-spacing:.4px; }
+  .src-box { border:1.5px solid #000; width:100%; text-align:center; padding:6px 4px; font-size:10px; line-height:1.4; }
+  .src-box strong { display:block; font-size:11px; margin-bottom:1px; }
+  .src-icon { font-size:28px; margin-bottom:2px; }
+
+  /* Arrow right */
+  .arr-r { font-size:20px; font-weight:900; align-self:center; margin-top:-60px; padding:0 4px; }
+
+  /* Main diagram */
+  .main { flex:1; display:flex; flex-direction:column; align-items:center; gap:0; }
+
+  /* Entry - dashboard */
+  .entry-box {
+    border:3px solid #000; background:#fff;
+    padding:10px 30px; font-size:13px; font-weight:900;
+    text-align:center; position:relative; width:320px;
+    display:flex; align-items:center; justify-content:center; gap:10px;
+  }
+  .laptop-icon { font-size:26px; }
+
+  /* Arrow */
+  .arr-d { text-align:center; font-size:16px; font-weight:900; line-height:1; height:20px; display:flex; align-items:center; justify-content:center; color:#000; }
+
+  /* Two columns */
+  .two-col { display:flex; gap:20px; width:100%; justify-content:center; }
+  .col { display:flex; flex-direction:column; align-items:center; gap:0; }
+  .col-label { font-size:9px; color:#444; font-style:italic; margin-bottom:4px; letter-spacing:.3px; }
+
+  /* Boxes */
+  .box { border:2px solid #000; background:#fff; font-size:10.5px; padding:7px 10px; text-align:center; line-height:1.5; }
+  .box-w180 { width:190px; }
+  .box-w200 { width:210px; }
+  .box-w420 { width:430px; }
+  .box-thick { border-width:3px; }
+  .box-icon { font-size:18px; margin-bottom:3px; display:block; }
+
+  /* Sub text */
+  .sub { font-size:9px; color:#555; text-align:center; margin:2px 0 1px; line-height:1.4; }
+
+  /* Diamond */
+  .diamond-outer { position:relative; width:100px; height:68px; display:flex; align-items:center; justify-content:center; margin:2px 0; }
+  .diamond-shape { width:80px; height:56px; background:#fff; border:2.5px solid #000; transform:rotate(45deg); position:absolute; }
+  .diamond-label { position:relative; z-index:1; font-size:10px; font-weight:700; text-align:center; line-height:1.3; }
+
+  /* Risk badges */
+  .risk-col { display:flex; flex-direction:column; gap:4px; align-items:center; }
+  .rb { font-size:10px; font-weight:700; padding:4px 16px; border:1.5px solid #000; border-radius:2px; min-width:90px; text-align:center; color:#fff; }
+  .rb-n { background:#22c55e; }
+  .rb-w { background:#eab308; }
+  .rb-wa { background:#f97316; }
+  .rb-c  { background:#ef4444; }
+
+  /* Converge */
+  .converge { display:flex; justify-content:center; gap:100px; font-size:16px; font-weight:900; margin:4px 0; color:#000; }
+
+  /* Alert row */
+  .alert-row { display:flex; gap:10px; justify-content:center; align-items:stretch; }
+  .offline-box { border:2px dashed #666; background:#f9f9f9; font-size:10px; padding:7px 10px; text-align:center; line-height:1.5; width:140px; }
+
+  /* Logo */
+  .logo-row { display:flex; justify-content:flex-end; margin-top:12px; }
+  .logo-text { font-size:20px; font-weight:900; }
+  .logo-blue { color:#1d4ed8; }
+
+  /* Footnote hint */
+  .hint { font-size:9px; color:#888; font-style:italic; text-align:center; }
+
+  hr.div { border:none; border-top:1.5px solid #000; width:100%; margin:6px 0; }
+</style>
+</head>
+<body>
+<div class="slide">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="title">SYSTEM ARCHITECTURE</div>
+    <div class="sih-badge-text">🧠 Smart India<br/>Hackathon 2026</div>
+  </div>
+
+  <div class="body">
+
+    <!-- LEFT: Data Sources -->
+    <div class="left-col">
+      <!-- Canva tip: replace these emoji with Canva "Government Building" sticker -->
+      <div class="src-icon">🏛️</div>
+      <div class="section-label">USERS /<br/>DATA SOURCES</div>
+
+      <div class="src-box">
+        <!-- Canva: "Government Document" sticker -->
+        <span style="font-size:18px">📊</span><br/>
+        <strong>Govt. Records</strong>
+        Census 2011<br/>data.gov.in
+      </div>
+
+      <div class="src-box">
+        <!-- Canva: "School" or "Book" sticker -->
+        <span style="font-size:18px">🏫</span><br/>
+        <strong>UDISE+</strong>
+        School<br/>Enrollment
+      </div>
+
+      <div class="src-box">
+        <!-- Canva: "Doctor" or "Health" sticker -->
+        <span style="font-size:18px">🏥</span><br/>
+        <strong>NHM / ASHA</strong>
+        Workers (PHC)
+      </div>
+
+      <div class="src-box">
+        <!-- Canva: "Community People" sticker (like your friend's) -->
+        <span style="font-size:18px">🤝</span><br/>
+        <strong>NGOs</strong>
+        SEEDS India<br/>HelpAge India
+      </div>
+
+      <div class="src-box">
+        <!-- Canva: "Wifi / Sensor" sticker -->
+        <span style="font-size:18px">📡</span><br/>
+        <strong>IoT Sensors</strong>
+        Field-deployed
+      </div>
+
+      <!-- Canva: "Community / People" icon like friend's bottom left -->
+      <div style="font-size:36px; margin-top:6px; text-align:center;">👨‍👩‍👧‍👦</div>
+      <div style="font-size:9px; color:#555; text-align:center;">Field teams /<br/>Local community</div>
+    </div>
+
+    <!-- Arrow right -->
+    <div class="arr-r" style="margin-top:80px;">→</div>
+
+    <!-- MAIN DIAGRAM -->
+    <div class="main">
+
+      <!-- Entry: Web Dashboard -->
+      <div class="entry-box">
+        <!-- Canva: "Laptop / Monitor" sticker here -->
+        <span class="laptop-icon">🖥️</span>
+        <div>
+          <div style="font-size:11px; color:#555; font-weight:400;">Web-based</div>
+          <div>JeevanSetu Dashboard</div>
+        </div>
+      </div>
+
+      <div class="arr-d">↓</div>
+      <div class="sub">Data collected → processed → action triggered</div>
+      <div class="arr-d" style="height:6px;"></div>
+
+      <!-- TWO PARALLEL FLOWS -->
+      <div class="two-col">
+
+        <!-- LEFT: Sensor Pipeline -->
+        <div class="col">
+          <div class="col-label">— Sensor Pipeline —</div>
+
+          <div class="box box-w180">
+            <!-- Canva: "Rain / Sensor" sticker -->
+            <span class="box-icon">🌧️</span>
+            <strong>IoT Sensor Input</strong><br/>
+            <span class="sub">Rain gauge · Soil probe · Stream sensor</span>
+          </div>
+
+          <div class="arr-d">↓</div>
+
+          <div class="box box-w180">
+            <span class="box-icon">🔍</span>
+            <strong>Data Validation</strong><br/>
+            <span class="sub">3-point rolling median filter<br/>→ spike rejection</span>
+          </div>
+
+          <div class="arr-d">↓</div>
+
+          <div class="box box-w180 box-thick">
+            <!-- Canva: "CPU / Engine" sticker -->
+            <span class="box-icon">⚙️</span>
+            <strong>Risk Scoring Engine</strong><br/>
+            <span class="sub">
+              Rainfall 40pts + Soil 25pts<br/>
+              Stream 20pts + Terrain 15pts<br/>
+              = Ward Score <strong>0–100</strong>
+            </span>
+          </div>
+
+          <div class="arr-d">↓</div>
+
+          <div class="diamond-outer">
+            <div class="diamond-shape"></div>
+            <div class="diamond-label">Risk<br/>State?</div>
+          </div>
+
+          <div class="arr-d">↓</div>
+
+          <div class="risk-col">
+            <div class="rb rb-n">🟢 NORMAL</div>
+            <div class="rb rb-w">🟡 WATCH</div>
+            <div class="rb rb-wa">🟠 WARNING</div>
+            <div class="rb rb-c">🔴 CRITICAL</div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Vulnerability Pipeline -->
+        <div class="col">
+          <div class="col-label">— Vulnerability Pipeline —</div>
+
+          <div class="box box-w200">
+            <!-- Canva: "Elderly / Pregnant woman / Child" sticker group -->
+            <span class="box-icon">👴🤰👧🦽</span>
+            <strong>Vulnerability Index</strong><br/>
+            <span class="sub">Elderly · Pregnant · Children<br/>Specially-abled (ward-wise count)</span>
+          </div>
+
+          <div class="arr-d">↓</div>
+
+          <div class="box box-w200">
+            <!-- Canva: "Map / Mountain / River" sticker -->
+            <span class="box-icon">🏔️→🌊</span>
+            <strong>Upstream Propagation Model</strong><br/>
+            <span class="sub">
+              Ward 1 (1240m) → Ward 3 (760m)<br/>
+              → Ward 4 (620m)<br/>
+              Predicts next flood zone
+            </span>
+          </div>
+
+          <div class="arr-d">↓</div>
+
+          <div class="box box-w200">
+            <!-- Canva: "Warning / Priority" sticker -->
+            <span class="box-icon">🚨</span>
+            <strong>Priority Classification</strong><br/>
+            <span class="sub">
+              Schools / Hospitals →<br/>
+              <strong>EVACUATE FIRST</strong><br/>
+              Anganwadis → <strong>NOTIFY</strong>
+            </span>
+          </div>
+
+          <div class="sub" style="margin-top:4px;">(auto-triggered at WARNING+)</div>
+        </div>
+
+      </div><!-- /two-col -->
+
+      <!-- Converge -->
+      <div class="converge">↓ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ↓</div>
+      <hr class="div" style="width:450px;"/>
+
+      <!-- Infrastructure State Engine -->
+      <div class="box box-w420 box-thick">
+        <!-- Canva: "Bridge" or "Road" sticker -->
+        <span class="box-icon">🌉🛣️🏠</span>
+        <strong>Infrastructure State Engine</strong><br/>
+        <span class="sub" style="font-size:10px;">
+          East Bridge: OPEN → CAUTION → CLOSED &nbsp;|&nbsp; Shelter: STANDBY → PREPARING → OPEN<br/>
+          Safe Route arrow activates on map at WARNING+
+        </span>
+      </div>
+
+      <div class="arr-d">↓</div>
+
+      <!-- Alert Generation + Offline -->
+      <div class="alert-row">
+        <div class="box" style="width:200px;">
+          <!-- Canva: "Bell / Notification" sticker -->
+          <span class="box-icon">🔔</span>
+          <strong>Alert Generation</strong><br/>
+          <span class="sub">
+            🇬🇧 English Alert Card<br/>
+            🇮🇳 हिंदी Alert Card (Devanagari)
+          </span>
+        </div>
+        <div class="offline-box">
+          <!-- Canva: "Offline / No-wifi" sticker -->
+          <span style="font-size:18px;">📵</span><br/>
+          <strong>Offline Mode</strong><br/>
+          <span class="sub">SVG Map + Cached Data<br/>Zero internet needed<br/>Works when towers cut</span>
+        </div>
+      </div>
+
+      <div class="arr-d">↓</div>
+
+      <!-- Alert Chain -->
+      <div class="box box-w420">
+        <!-- Canva: "Chain / Team" sticker -->
+        <span class="box-icon">🔗</span>
+        <strong>Alert Chain</strong> (Timestamped)<br/>
+        <span class="sub" style="font-size:10.5px;">
+          👤 Volunteer &nbsp;→&nbsp; 🧑‍💼 Coordinator &nbsp;→&nbsp; 🏛️ District Response Team
+        </span>
+      </div>
+
+    </div><!-- /main -->
+  </div><!-- /body -->
+
+  <!-- Logo -->
+  <div class="logo-row">
+    <span class="logo-text"><span class="logo-blue">Jeevan</span>Setu</span>
+  </div>
+
+</div>
+</body>
+</html>

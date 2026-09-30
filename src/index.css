@@ -473,3 +473,105 @@ button:active {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* ── MOBILE RESPONSIVE ────────────────────────────────────────
+   Target users: village volunteers / field responders on phones
+   ─────────────────────────────────────────────────────────── */
+
+/* Tablet — collapse 3-col to 2-col */
+@media (max-width: 1100px) {
+  .dashboard-main-grid {
+    grid-template-columns: 260px 1fr !important;
+  }
+  .dashboard-right-sidebar {
+    display: none !important;
+  }
+  .dashboard-right-sidebar.mobile-visible {
+    display: flex !important;
+    flex-direction: column;
+    grid-column: 1 / -1;
+  }
+}
+
+/* Mobile — single column, everything stacks */
+@media (max-width: 768px) {
+  /* Nav */
+  #main-navbar {
+    flex-wrap: wrap;
+    height: auto !important;
+    padding: 10px 14px !important;
+    gap: 8px !important;
+  }
+  .navbar-center { display: none; }
+
+  /* Main grid → single column */
+  .dashboard-main-grid {
+    grid-template-columns: 1fr !important;
+    padding: 10px 12px !important;
+    gap: 12px !important;
+  }
+  .dashboard-right-sidebar {
+    display: flex !important;
+    flex-direction: column;
+    order: 3;
+  }
+
+  /* Section grids → single column */
+  .dashboard-section-2col {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Telemetry strip → wrap */
+  .telemetry-strip {
+    flex-wrap: wrap;
+    gap: 8px !important;
+  }
+
+  /* Leaflet map height on mobile */
+  .leaflet-map-container {
+    height: 280px !important;
+  }
+
+  /* Village quick guide → compact */
+  .village-quick-guide {
+    font-size: 12px !important;
+  }
+
+  /* Cards — reduce padding on mobile */
+  .glass-card {
+    border-radius: 10px !important;
+  }
+
+  /* Simulator buttons → wrap */
+  .simulator-buttons {
+    flex-wrap: wrap;
+  }
+
+  /* Table — horizontal scroll on mobile */
+  .responsive-table {
+    overflow-x: auto;
+  }
+
+  /* Hide heavy decorative elements on mobile */
+  .mobile-hide {
+    display: none !important;
+  }
+
+  /* Role switcher — smaller on mobile */
+  .role-switcher {
+    font-size: 10px !important;
+    padding: 4px 8px !important;
+  }
+}
+
+/* Very small phones */
+@media (max-width: 420px) {
+  #main-navbar .nav-brand-title {
+    font-size: 16px !important;
+  }
+  .dashboard-main-grid {
+    padding: 8px !important;
+    gap: 8px !important;
+  }
+}
+

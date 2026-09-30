@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>JeevanSetu — Technical Approach</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #888;
+    font-family: Arial, Helvetica, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  /* 16:9 PPT Slide */
+  .slide {
+    width: 1280px;
+    height: 720px;
+    background: #ffffff;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 14px 18px 12px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  }
+
+  /* Hint */
+  .hint {
+    position: fixed; top: 8px; left: 50%; transform: translateX(-50%);
+    background: #1d4ed8; color: #fff; padding: 5px 18px;
+    border-radius: 4px; font-family: Arial; font-size: 12px; font-weight: 700; z-index: 999;
+  }
+
+  /* ── TOP ROW: oval + title + sih badge ── */
+  .top-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 10px;
+    flex-shrink: 0;
+  }
+  .team-oval {
+    border: 2px solid #555;
+    border-radius: 50px;
+    padding: 5px 18px;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .slide-title {
+    font-size: 22px;
+    font-weight: 900;
+    text-decoration: underline;
+    flex: 1;
+    text-align: center;
+  }
+  .sih-box {
+    border: 1.5px solid #333;
+    padding: 4px 10px;
+    font-size: 9.5px;
+    font-weight: 700;
+    text-align: center;
+    line-height: 1.5;
+    flex-shrink: 0;
+  }
+
+  /* ── BODY: LEFT + DIVIDER + RIGHT ── */
+  .body {
+    display: flex;
+    gap: 16px;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* ── LEFT SIDE ── */
+  .left {
+    width: 420px;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+  .tech-section { margin-bottom: 7px; }
+  .tech-section p {
+    font-size: 10px;
+    color: #111;
+    line-height: 1.55;
+    margin-bottom: 2px;
+  }
+  .tech-section p strong { color: #000; font-size: 10.5px; }
+  .tech-heading { font-size: 13px; font-weight: 900; margin-bottom: 6px; }
+
+  /* Tech logos row */
+  .logos { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: auto; padding-top: 8px; }
+  .logo-chip {
+    display: flex; flex-direction: column; align-items: center;
+    font-size: 7.5px; color: #333; gap: 2px;
+  }
+  .logo-circle {
+    width: 38px; height: 38px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 900;
+  }
+  /* Logo colors */
+  .lc-react  { background: #1e3a5f; color: #61dafb; }
+  .lc-vite   { background: #646cff; color: #fff; font-size:13px; }
+  .lc-js     { background: #f7df1e; color: #000; }
+  .lc-tail   { background: #0ea5e9; color: #fff; font-size:13px; }
+  .lc-recharts { background: #22c55e; color: #fff; font-size:12px; }
+  .lc-svg    { background: #f97316; color: #fff; font-size:12px; }
+  .lc-python { background: #3b82f6; color: #fff; font-size:12px; }
+  .lc-sms    { background: #8b5cf6; color: #fff; font-size:13px; }
+  .lc-gh     { background: #111; color: #fff; font-size:15px; }
+  .lc-rpi    { background: #c0392b; color: #fff; font-size:13px; }
+  .lc-pwa    { background: #6366f1; color: #fff; font-size:12px; }
+  .lc-imd    { background: #0891b2; color: #fff; font-size:10px; font-weight:900; }
+
+  /* ── DIVIDER ── */
+  .vdiv { width: 1.5px; background: #aaa; flex-shrink: 0; }
+
+  /* ── RIGHT SIDE: Tech Flow Diagram ── */
+  .right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Diagram boxes */
+  .db {
+    border: 2px solid #000;
+    background: #fff;
+    font-size: 9px;
+    padding: 5px 7px;
+    text-align: center;
+    line-height: 1.45;
+  }
+  .db strong { font-size: 9.5px; display: block; margin-bottom: 1px; }
+  .db .ico { font-size: 14px; display: block; margin-bottom: 2px; }
+  .db .sub { font-size: 8px; color: #555; line-height: 1.3; }
+  .db-thick { border-width: 3px; }
+  .db-w160 { width: 160px; }
+  .db-w200 { width: 205px; }
+  .db-w380 { width: 385px; }
+
+  /* Arrow */
+  .da { font-size: 13px; font-weight: 900; text-align: center; line-height: 1; padding: 2px 0; color: #000; }
+
+  /* Two col */
+  .dtwo { display: flex; gap: 10px; justify-content: center; width: 100%; }
+  .dcol { display: flex; flex-direction: column; align-items: center; gap: 0; }
+  .dcol-lbl { font-size: 7.5px; color: #666; font-style: italic; margin-bottom: 2px; }
+
+  /* Vertical label */
+  .layer-label {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(180deg);
+    font-size: 8px;
+    font-weight: 900;
+    text-transform: uppercase;
+    color: #555;
+    letter-spacing: 2px;
+    border: 1px solid #999;
+    padding: 8px 3px;
+    background: #f0f0f0;
+    height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 4px;
+    flex-shrink: 0;
+  }
+
+  /* Diamond */
+  .dw { position: relative; width: 70px; height: 48px; display: flex; align-items: center; justify-content: center; margin: 1px 0; }
+  .ds { width: 56px; height: 40px; background: #fff; border: 2px solid #000; transform: rotate(45deg); position: absolute; }
+  .dt { position: relative; z-index: 1; font-size: 7.5px; font-weight: 700; text-align: center; line-height: 1.2; }
+
+  /* Risk small badges */
+  .sr { font-size: 8px; font-weight: 700; padding: 2px 8px; border: 1px solid #000; color: #fff; text-align: center; min-width: 70px; }
+  .sn { background: #16a34a; } .sw { background: #ca8a04; } .swa { background: #ea580c; } .sc { background: #dc2626; }
+
+  /* Converge */
+  .conv2 { display: flex; justify-content: center; gap: 70px; font-size: 13px; font-weight: 900; color: #000; margin: 2px 0; }
+
+  /* Offline box */
+  .offline-r { border: 2px dashed #555; background: #f9f9f9; font-size: 8px; padding: 4px 6px; text-align: center; line-height: 1.4; width: 110px; }
+
+  /* Alert row */
+  .alert-r { display: flex; gap: 6px; justify-content: center; align-items: stretch; }
+
+  /* Future badge */
+  .future { border: 1.5px dashed #3b82f6; background: #eff6ff; color: #1d4ed8; font-size: 7.5px; padding: 3px 6px; text-align: center; border-radius: 3px; }
+
+  /* JeevanSetu logo */
+  .logo { position: absolute; bottom: 4px; right: 10px; font-size: 14px; font-weight: 900; }
+  .logo span { color: #1d4ed8; }
+</style>
+</head>
+<body>
+
+<div class="hint">💡 Press Cmd+Shift+4 to screenshot the white slide area</div>
+
+<div class="slide">
+
+  <!-- TOP ROW -->
+  <div class="top-row">
+    <div class="team-oval">JeevanSetu</div>
+    <div class="slide-title">TECHNICAL APPROACH</div>
+    <div class="sih-box">🧠 Smart India<br/>Hackathon 2026</div>
+  </div>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <!-- ── LEFT: Technologies ── -->
+    <div class="left">
+      <div class="tech-heading">Technologies:</div>
+
+      <div class="tech-section">
+        <p><strong>Frontend:</strong> React 19, Vite, Tailwind CSS v4, Custom CSS Design System</p>
+        <p><strong>Charts &amp; Visualisation:</strong> Recharts (AreaChart sparklines), Custom SVG arc gauge</p>
+        <p><strong>Map:</strong> Hand-crafted SVG (offline — zero Google Maps / Mapbox dependency)</p>
+        <p><strong>Risk Engine:</strong> Rule-based JavaScript (9 scoring functions) — expandable to ML</p>
+        <p><strong>State Management:</strong> Custom React hooks — useScenario.js, useConnectivity.js</p>
+        <p><strong>Data Layer:</strong> Static JS files (scenarios, wards, infrastructure, vulnerablePOI, microTrend)</p>
+        <p><strong>Sensors (Production):</strong> IMD rain gauges, CWC stream sensors, capacitance soil probes → REST API</p>
+        <p><strong>Future ML:</strong> XGBoost / LSTM trained on 50-year IMD rainfall + CWC stream records</p>
+        <p><strong>Alerts (Production):</strong> Twilio / Gupshup SMS API + IVR calls in Hindi for feature phones</p>
+        <p><strong>Deployment:</strong> Static hosting / PWA / Raspberry Pi (₹500 per village node)</p>
+        <p><strong>APIs &amp; Tools:</strong> GitHub, VS Code, data.gov.in, UDISE+, NHM open data</p>
+      </div>
+
+      <!-- Tech logos -->
+      <div class="logos">
+        <div class="logo-chip"><div class="logo-circle lc-react">⚛</div><span>React 19</span></div>
+        <div class="logo-chip"><div class="logo-circle lc-vite">⚡</div><span>Vite</span></div>
+        <div class="logo-chip"><div class="logo-circle lc-js">JS</div><span>JavaScript</span></div>
+        <div class="logo-chip"><div class="logo-circle lc-tail">🌊</div><span>Tailwind</span></div>
+        <div class="logo-chip"><div class="logo-circle lc-recharts">📈</div><span>Recharts</span></div>
+        <div class="logo-chip"><div class="logo-circle lc-svg">🗺</div><span>SVG Map</span></div>
+        <div class="logo-chip"><div class="logo-circle lc-python">🐍</div><span>Python (ML)</span></div>
+        <div class="logo-chip"><div class="logo-circle lc-sms">📱</div><span>SMS/IVR</span></div>
+        <div class="logo-chip"><div class="logo-circle lc-gh">🐙</div><span>GitHub</span></div>
+        <div class="logo-chip"><div class="logo-circle lc-rpi">🥧</div><span>Raspberry Pi</span></div>
+        <div class="logo-chip"><div class="logo-circle lc-pwa">📲</div><span>PWA</span></div>
+        <div class="logo-chip"><div class="logo-circle lc-imd">IMD</div><span>IMD/CWC</span></div>
+      </div>
+    </div>
+
+    <!-- ── DIVIDER ── -->
+    <div class="vdiv"></div>
+
+    <!-- ── RIGHT: Technical Flow ── -->
+    <div class="right">
+
+      <!-- Entry -->
+      <div class="db db-w380 db-thick" style="display:flex; align-items:center; gap:10px; padding:6px 14px; justify-content:center;">
+        <span style="font-size:18px;">🖥️</span>
+        <div>
+          <strong style="font-size:11px;">Frontend — React 19 + Vite</strong>
+          <div class="sub">Dashboard UI · SVG Map · Recharts · Glassmorphism Design System</div>
+        </div>
+      </div>
+      <div class="da">↓</div>
+
+      <!-- TWO COLUMNS -->
+      <div style="display:flex; gap:8px; width:100%; justify-content:center; align-items:flex-start;">
+
+        <!-- LEFT COL -->
+        <div class="dcol">
+          <div class="dcol-lbl">— Sensor / Data Layer —</div>
+          <div class="db db-w160">
+            <span class="ico">📡</span>
+            <strong>IoT Sensor Input</strong>
+            <div class="sub">Rain · Soil · Stream<br/>(simulated → IMD/CWC in prod)</div>
+          </div>
+          <div class="da">↓</div>
+          <div class="db db-w160">
+            <span class="ico">🗂️</span>
+            <strong>Static Data Files</strong>
+            <div class="sub">scenarios.js · wards.js<br/>infrastructure.js · vulnerablePOI.js<br/>microTrend.js</div>
+          </div>
+          <div class="da">↓</div>
+          <div class="db db-w160 db-thick">
+            <span class="ico">⚙️</span>
+            <strong>riskEngine.js</strong>
+            <div class="sub">9 scoring functions<br/>Ward Score 0–100<br/>Explainable output</div>
+          </div>
+          <div class="da">↓</div>
+          <div class="dw"><div class="ds"></div><div class="dt">Risk<br/>State?</div></div>
+          <div class="da">↓</div>
+          <div style="display:flex;flex-direction:column;gap:3px;align-items:center;">
+            <div class="sr sn">NORMAL</div>
+            <div class="sr sw">WATCH</div>
+            <div class="sr swa">WARNING</div>
+            <div class="sr sc">CRITICAL</div>
+          </div>
+        </div>
+
+        <!-- RIGHT COL -->
+        <div class="dcol">
+          <div class="dcol-lbl">— State / Action Layer —</div>
+          <div class="db db-w200 db-thick">
+            <span class="ico">🪝</span>
+            <strong>useScenario.js Hook</strong>
+            <div class="sub">Central state · Live ±2 jitter<br/>Auto-play · Rainfall slider<br/>Alert feed · Shelter state</div>
+          </div>
+          <div class="da">↓</div>
+          <div class="db db-w200">
+            <span class="ico">📡</span>
+            <strong>useConnectivity.js Hook</strong>
+            <div class="sub">Online/offline detection<br/>Offline mode toggle</div>
+          </div>
+          <div class="da">↓</div>
+          <div class="db db-w200">
+            <span class="ico">🧩</span>
+            <strong>Component Layer</strong>
+            <div class="sub">WardMap · TelemetryBar · RiskScorePanel<br/>EvacuationPanel · ShelterCard<br/>AlertPanel (EN+HI) · SimulatorPanel</div>
+          </div>
+          <div class="da">↓</div>
+          <div class="db db-w200">
+            <span class="ico">🔔</span>
+            <strong>Alert Chain Output</strong>
+            <div class="sub">English + हिंदी alert cards<br/>Volunteer → Coordinator → District</div>
+          </div>
+          <div style="margin-top:4px;">
+            <div class="future">🚀 Production: Twilio SMS + IVR Hindi calls</div>
+          </div>
+        </div>
+
+        <!-- VERTICAL LABEL -->
+        <div class="layer-label">DATA FLOW LAYER</div>
+
+      </div>
+
+      <!-- BOTTOM -->
+      <div class="da" style="margin-top:4px;">↓</div>
+      <div class="alert-r">
+        <div class="db" style="width:190px;">
+          <span class="ico">🗺️</span>
+          <strong>Offline SVG Map</strong>
+          <div class="sub">Zero internet · No tile server<br/>Cached ward data · Works when towers cut</div>
+        </div>
+        <div class="offline-r">
+          <span style="font-size:14px;">📵</span><br/>
+          <strong>PWA / Raspberry Pi</strong><br/>
+          <div class="sub">Runs on ₹500 device<br/>Any static host</div>
+        </div>
+      </div>
+
+      <div class="logo"><span>Jeevan</span>Setu</div>
+    </div>
+
+  </div><!-- /body -->
+</div><!-- /slide -->
+</body>
+</html>

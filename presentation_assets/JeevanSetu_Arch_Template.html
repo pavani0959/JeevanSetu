@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>JeevanSetu — Architecture Template</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #f0f0f0;
+    display: flex; justify-content: center; align-items: center;
+    min-height: 100vh; padding: 20px;
+    font-family: Arial, sans-serif;
+  }
+
+  /* Canvas: AquaCreds-style portrait = 750 x 1050 */
+  .canvas {
+    width: 750px;
+    background: #fff;
+    padding: 20px;
+    display: flex;
+    gap: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  }
+
+  /* ── LEFT COLUMN ── */
+  .left {
+    width: 130px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    padding-top: 20px;
+  }
+  .icon-circle {
+    width: 56px; height: 56px;
+    border: 2px solid #000;
+    border-radius: 50%;
+    background: #fff;
+  }
+  .hdr-box {
+    width: 100%; height: 40px;
+    border: 2px solid #000;
+    background: #e0e0e0;
+  }
+  .src-box {
+    width: 100%; height: 70px;
+    border: 2px solid #000;
+    background: #fff;
+  }
+  .icon-star {
+    width: 56px; height: 56px;
+    border: 2px solid #000;
+    border-radius: 4px;
+    background: #fff;
+    margin-top: 8px;
+  }
+
+  /* ── ARROW RIGHT ── */
+  .arr-connector {
+    display: flex;
+    align-items: center;
+    padding-bottom: 580px;
+    flex-shrink: 0;
+  }
+  .arr-h {
+    width: 20px; height: 0;
+    border-top: 2px solid #000;
+    position: relative;
+  }
+  .arr-h::after {
+    content: '';
+    position: absolute;
+    right: -1px; top: -5px;
+    border: 5px solid transparent;
+    border-left: 8px solid #000;
+  }
+
+  /* ── MAIN FLOW ── */
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  /* Generic empty box */
+  .box {
+    background: #fff;
+    border: 2px solid #000;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+  }
+  .box-lines {
+    width: 70%;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .line {
+    height: 2px;
+    background: #bbb;
+    border-radius: 1px;
+  }
+  .line.short { width: 60%; }
+  .line.med   { width: 85%; }
+  .line.full  { width: 100%; }
+
+  .box-thick { border-width: 3px; }
+  .box-dashed { border: 2px dashed #555; }
+
+  /* Widths */
+  .w-full  { width: 100%; }
+  .w-half  { width: 47%; }
+  .w-third { width: 30%; }
+
+  /* Heights */
+  .h-60  { height: 60px; }
+  .h-70  { height: 70px; }
+  .h-80  { height: 80px; }
+  .h-50  { height: 50px; }
+  .h-40  { height: 40px; }
+  .h-35  { height: 35px; }
+
+  /* Arrow down */
+  .ad {
+    width: 0; height: 18px;
+    border-left: 2px solid #000;
+    position: relative;
+  }
+  .ad::after {
+    content: '';
+    position: absolute;
+    bottom: -1px; left: -6px;
+    border: 6px solid transparent;
+    border-top: 9px solid #000;
+  }
+
+  /* Two-col layout */
+  .two {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    justify-content: center;
+  }
+  .col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    flex: 1;
+  }
+
+  /* Diamond */
+  .diamond-wrap {
+    width: 90px; height: 62px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 4px 0;
+  }
+  .diamond-shape {
+    width: 70px; height: 50px;
+    border: 2.5px solid #000;
+    background: #fff;
+    transform: rotate(45deg);
+    position: absolute;
+  }
+
+  /* Status badges */
+  .badges {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: center;
+    margin: 2px 0;
+  }
+  .badge {
+    width: 90px; height: 22px;
+    border: 2px solid #000;
+    background: #fff;
+  }
+
+  /* Converge arrows */
+  .converge {
+    display: flex;
+    justify-content: center;
+    gap: 80px;
+    width: 100%;
+    margin: 2px 0;
+  }
+  .ad-small {
+    width: 0; height: 14px;
+    border-left: 2px solid #000;
+    position: relative;
+  }
+  .ad-small::after {
+    content: '';
+    position: absolute;
+    bottom: -1px; left: -5px;
+    border: 5px solid transparent;
+    border-top: 7px solid #000;
+  }
+
+  /* Horizontal arrow with dashed box side */
+  .row-with-side {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+  }
+  .side-arr {
+    width: 20px; height: 0;
+    border-top: 2px dashed #555;
+    position: relative;
+  }
+  .side-arr::before {
+    content: '';
+    position: absolute;
+    left: -1px; top: -5px;
+    border: 5px solid transparent;
+    border-right: 8px solid #555;
+  }
+
+  /* Bottom 3-split */
+  .three {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+    justify-content: center;
+  }
+  .arr-split {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    padding: 0 10px;
+    margin: 0;
+  }
+  .ad-branch {
+    width: 0; height: 14px;
+    border-left: 2px solid #000;
+    position: relative;
+  }
+  .ad-branch::after {
+    content: '';
+    position: absolute;
+    bottom: -1px; left: -5px;
+    border: 5px solid transparent;
+    border-top: 7px solid #000;
+  }
+</style>
+</head>
+<body>
+
+<div class="canvas">
+
+  <!-- LEFT COLUMN: data source boxes (empty) -->
+  <div class="left">
+    <div class="icon-circle"></div>
+    <div class="hdr-box"></div>
+    <div class="src-box"></div>
+    <div class="src-box"></div>
+    <div class="src-box"></div>
+    <div class="src-box"></div>
+    <div class="src-box"></div>
+    <div class="icon-star"></div>
+  </div>
+
+  <!-- ARROW RIGHT connecting left col to main -->
+  <div class="arr-connector">
+    <div class="arr-h"></div>
+  </div>
+
+  <!-- MAIN FLOW -->
+  <div class="main">
+
+    <!-- Entry box -->
+    <div class="box box-thick w-full h-60">
+      <div class="box-lines">
+        <div class="line full"></div>
+        <div class="line med"></div>
+      </div>
+    </div>
+
+    <div class="ad"></div>
+
+    <!-- Sensor Pipeline + Vulnerability Pipeline labels -->
+    <div style="display:flex; justify-content:space-around; width:100%; margin-bottom:2px;">
+      <div style="width:30px; height:2px; background:#bbb; margin-top:8px;"></div>
+      <div style="width:30px; height:2px; background:#bbb; margin-top:8px;"></div>
+    </div>
+
+    <!-- TWO PARALLEL BOXES -->
+    <div class="two">
+      <div class="col">
+        <div class="box w-full h-70">
+          <div class="box-lines">
+            <div class="line full"></div>
+            <div class="line med"></div>
+            <div class="line short"></div>
+          </div>
+        </div>
+        <div class="ad"></div>
+        <div class="box w-full h-70">
+          <div class="box-lines">
+            <div class="line full"></div>
+            <div class="line med"></div>
+            <div class="line short"></div>
+          </div>
+        </div>
+        <div class="ad"></div>
+        <div class="box box-thick w-full h-80">
+          <div class="box-lines">
+            <div class="line full"></div>
+            <div class="line full"></div>
+            <div class="line med"></div>
+            <div class="line short"></div>
+          </div>
+        </div>
+        <div class="ad"></div>
+        <!-- Diamond -->
+        <div class="diamond-wrap">
+          <div class="diamond-shape"></div>
+        </div>
+        <div class="ad"></div>
+        <!-- 4 status badges -->
+        <div class="badges">
+          <div class="badge"></div>
+          <div class="badge"></div>
+          <div class="badge"></div>
+          <div class="badge"></div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="box w-full h-70">
+          <div class="box-lines">
+            <div class="line full"></div>
+            <div class="line med"></div>
+            <div class="line short"></div>
+          </div>
+        </div>
+        <div class="ad"></div>
+        <div class="box w-full h-80">
+          <div class="box-lines">
+            <div class="line full"></div>
+            <div class="line med"></div>
+            <div class="line short"></div>
+            <div class="line short"></div>
+          </div>
+        </div>
+        <div class="ad"></div>
+        <div class="box w-full h-80">
+          <div class="box-lines">
+            <div class="line full"></div>
+            <div class="line med"></div>
+            <div class="line short"></div>
+            <div class="line short"></div>
+          </div>
+        </div>
+        <div style="height:14px; display:flex; align-items:center; justify-content:center; font-size:10px; color:#888; font-style:italic; margin-top:2px;">&nbsp;</div>
+      </div>
+    </div>
+
+    <!-- Converge arrows -->
+    <div class="converge">
+      <div class="ad-small"></div>
+      <div class="ad-small"></div>
+    </div>
+
+    <!-- Infrastructure wide box -->
+    <div class="box box-thick w-full h-70">
+      <div class="box-lines">
+        <div class="line full"></div>
+        <div class="line med"></div>
+        <div class="line short"></div>
+      </div>
+    </div>
+
+    <div class="ad"></div>
+
+    <!-- Alert + Offline side by side -->
+    <div class="row-with-side">
+      <div class="box h-70" style="width:55%;">
+        <div class="box-lines">
+          <div class="line full"></div>
+          <div class="line med"></div>
+          <div class="line short"></div>
+        </div>
+      </div>
+      <div class="side-arr"></div>
+      <div class="box box-dashed h-70" style="width:35%;">
+        <div class="box-lines">
+          <div class="line full"></div>
+          <div class="line med"></div>
+          <div class="line short"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ad"></div>
+
+    <!-- Alert Chain wide box -->
+    <div class="box box-thick w-full h-50">
+      <div class="box-lines">
+        <div class="line full"></div>
+        <div class="line med"></div>
+      </div>
+    </div>
+
+    <!-- Branch split -->
+    <div class="arr-split">
+      <div class="ad-branch"></div>
+      <div class="ad-branch"></div>
+      <div class="ad-branch"></div>
+    </div>
+
+    <!-- Bottom 3 boxes -->
+    <div class="three">
+      <div class="box h-40" style="flex:1;">
+        <div class="line med"></div>
+      </div>
+      <div class="box h-40" style="flex:1;">
+        <div class="line med"></div>
+      </div>
+      <div class="box h-40" style="flex:1;">
+        <div class="line med"></div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+
+</div><!-- /canvas -->
+
+</body>
+</html>

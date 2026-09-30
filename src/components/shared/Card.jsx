@@ -6,7 +6,7 @@ export default function Card({ children, className = '', style = {}, title, titl
   return (
     <div
       className={`glass-card ${className}`}
-      style={style}
+      style={{ display: 'flex', flexDirection: 'column', ...style }}
     >
       {title && (
         <div
@@ -33,7 +33,12 @@ export default function Card({ children, className = '', style = {}, title, titl
           {titleRight && <span>{titleRight}</span>}
         </div>
       )}
-      <div style={noPad ? {} : { padding: title ? '0 16px 16px' : '16px' }}>
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        flex: 1,
+        ...(noPad ? {} : { padding: title ? '0 16px 16px' : '16px' })
+      }}>
         {children}
       </div>
     </div>

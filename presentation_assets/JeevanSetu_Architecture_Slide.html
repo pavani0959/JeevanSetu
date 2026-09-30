@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>JeevanSetu — System Architecture Slide</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #888;
+    font-family: Arial, Helvetica, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  /* Exact PPT slide: 16:9 = 1280x720 */
+  .slide {
+    width: 1280px;
+    height: 720px;
+    background: #ffffff;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 18px 22px 14px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  }
+
+  /* ── HEADER ── */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    flex-shrink: 0;
+  }
+  .title {
+    font-size: 22px;
+    font-weight: 900;
+    text-decoration: underline;
+    letter-spacing: 0.5px;
+  }
+  .sih-box {
+    border: 1.5px solid #333;
+    padding: 3px 10px;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.5;
+    text-align: center;
+  }
+
+  /* ── BODY ── */
+  .body {
+    display: flex;
+    gap: 8px;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* ── LEFT: DATA SOURCES ── */
+  .left {
+    width: 115px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  .left-title {
+    background: #e0e0e0;
+    border: 1.5px solid #000;
+    font-size: 8.5px;
+    font-weight: 900;
+    text-align: center;
+    padding: 4px 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  .src {
+    border: 1.5px solid #000;
+    font-size: 8.5px;
+    text-align: center;
+    padding: 4px 3px;
+    line-height: 1.35;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .src .ico { font-size: 16px; line-height: 1; margin-bottom: 2px; }
+  .src strong { font-size: 9px; display: block; }
+  .community { margin-top: 4px; text-align: center; }
+  .community .ico { font-size: 26px; }
+  .community p { font-size: 8px; color: #555; line-height: 1.3; }
+
+  /* ── ARROW RIGHT ── */
+  .arr-r {
+    font-size: 18px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    padding-bottom: 280px;
+    flex-shrink: 0;
+    color: #000;
+  }
+
+  /* ── MAIN DIAGRAM ── */
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    overflow: hidden;
+  }
+
+  /* Entry box */
+  .entry {
+    border: 3px solid #000;
+    padding: 7px 24px;
+    font-size: 12px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .entry .ico { font-size: 20px; }
+
+  /* Generic arrow down */
+  .ad { font-size: 14px; font-weight: 900; text-align: center; line-height: 1; padding: 2px 0; color: #000; flex-shrink: 0; width: 100%; }
+
+  /* Two-col flow */
+  .two { display: flex; gap: 14px; justify-content: center; width: 100%; }
+  .col { display: flex; flex-direction: column; align-items: center; gap: 0; }
+  .col-lbl { font-size: 8px; color: #555; font-style: italic; margin-bottom: 3px; }
+
+  /* Box */
+  .b {
+    border: 2px solid #000;
+    background: #fff;
+    font-size: 9px;
+    padding: 5px 7px;
+    text-align: center;
+    line-height: 1.4;
+    flex-shrink: 0;
+  }
+  .b .ico { font-size: 14px; display: block; margin-bottom: 2px; }
+  .bw170 { width: 178px; }
+  .bw190 { width: 195px; }
+  .bw390 { width: 400px; }
+  .bthick { border-width: 3px; }
+  .sub { font-size: 8px; color: #555; line-height: 1.35; margin: 1px 0; }
+
+  /* Diamond */
+  .diam-wrap { position: relative; width: 80px; height: 52px; display: flex; align-items: center; justify-content: center; margin: 2px 0; flex-shrink: 0; }
+  .diam-shape { width: 64px; height: 44px; background: #fff; border: 2px solid #000; transform: rotate(45deg); position: absolute; }
+  .diam-txt { position: relative; z-index: 1; font-size: 8.5px; font-weight: 700; text-align: center; line-height: 1.25; }
+
+  /* Risk badges */
+  .risks { display: flex; flex-direction: column; gap: 3px; align-items: center; flex-shrink: 0; }
+  .rb { font-size: 9px; font-weight: 700; padding: 3px 12px; border: 1.5px solid #000; min-width: 80px; text-align: center; color: #fff; }
+  .rbn { background: #16a34a; }
+  .rbw { background: #ca8a04; }
+  .rbwa { background: #ea580c; }
+  .rbc { background: #dc2626; }
+
+  /* Converge arrows */
+  .conv { display: flex; justify-content: center; gap: 88px; font-size: 14px; font-weight: 900; margin: 3px 0; color: #000; flex-shrink: 0; }
+
+  /* Divider */
+  .divl { border: none; border-top: 1.5px solid #000; width: 420px; margin: 3px auto; flex-shrink: 0; }
+
+  /* Alert row */
+  .alert-row { display: flex; gap: 8px; justify-content: center; align-items: stretch; flex-shrink: 0; }
+  .offline {
+    border: 2px dashed #555;
+    background: #f8f8f8;
+    font-size: 8.5px;
+    padding: 5px 7px;
+    text-align: center;
+    line-height: 1.4;
+    width: 128px;
+  }
+
+  /* Logo */
+  .logo { position: absolute; bottom: 10px; right: 18px; font-size: 16px; font-weight: 900; }
+  .logo span { color: #1d4ed8; }
+
+  /* Print hint */
+  .print-hint {
+    position: fixed; top: 8px; left: 50%; transform: translateX(-50%);
+    background: #1d4ed8; color: #fff; padding: 6px 20px;
+    border-radius: 4px; font-family: Arial; font-size: 12px; font-weight: 700;
+    z-index: 999;
+  }
+
+  @media print {
+    body { background: white; padding: 0; min-height: unset; }
+    .print-hint { display: none; }
+    .slide { box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="print-hint">💡 Press Cmd+Shift+4 to screenshot, or Cmd+P → Save as PDF → crop to slide</div>
+
+<div class="slide">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="title">SYSTEM ARCHITECTURE</div>
+    <div class="sih-box">🧠 Smart India<br/>Hackathon 2026</div>
+  </div>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <!-- LEFT: DATA SOURCES -->
+    <div class="left">
+      <div class="left-title">USERS /<br/>DATA SOURCES</div>
+      <div class="src">
+        <span class="ico">📊</span>
+        <strong>Govt. Records</strong>
+        Census 2011<br/>data.gov.in
+      </div>
+      <div class="src">
+        <span class="ico">🏫</span>
+        <strong>UDISE+</strong>
+        School Enrollment
+      </div>
+      <div class="src">
+        <span class="ico">🏥</span>
+        <strong>NHM / ASHA</strong>
+        Workers (PHC)
+      </div>
+      <div class="src">
+        <span class="ico">🤝</span>
+        <strong>NGOs</strong>
+        SEEDS India<br/>HelpAge India
+      </div>
+      <div class="src">
+        <span class="ico">📡</span>
+        <strong>IoT Sensors</strong>
+        Field-deployed
+      </div>
+      <div class="community">
+        <div class="ico">👨‍👩‍👧‍👦</div>
+        <p>Field teams &<br/>local community</p>
+      </div>
+    </div>
+
+    <!-- ARROW RIGHT -->
+    <div class="arr-r">→</div>
+
+    <!-- MAIN -->
+    <div class="main">
+
+      <!-- Entry -->
+      <div class="entry">
+        <span class="ico">🖥️</span>
+        <div>
+          <div style="font-size:9px;color:#666;font-weight:400;">Web-based Platform</div>
+          <div>JeevanSetu Dashboard</div>
+        </div>
+      </div>
+      <div class="ad">↓</div>
+      <div style="font-size:8px;color:#555;font-style:italic;margin-bottom:1px;">Data collected → processed → action triggered in &lt;3 seconds</div>
+      <div class="ad" style="padding:1px 0;"></div>
+
+      <!-- TWO COL -->
+      <div class="two">
+
+        <!-- LEFT PIPELINE -->
+        <div class="col">
+          <div class="col-lbl">— Sensor Pipeline —</div>
+          <div class="b bw170">
+            <span class="ico">🌧️</span>
+            <strong>IoT Sensor Input</strong><br/>
+            <span class="sub">Rain gauge · Soil probe · Stream sensor</span>
+          </div>
+          <div class="ad">↓</div>
+          <div class="b bw170">
+            <span class="ico">🔍</span>
+            <strong>Data Validation</strong><br/>
+            <span class="sub">3-point rolling median filter → spike rejection</span>
+          </div>
+          <div class="ad">↓</div>
+          <div class="b bw170 bthick">
+            <span class="ico">⚙️</span>
+            <strong>Risk Scoring Engine</strong><br/>
+            <span class="sub">Rainfall 40pts + Soil 25pts<br/>Stream 20pts + Terrain 15pts<br/>= Ward Score <strong>0–100</strong></span>
+          </div>
+          <div class="ad">↓</div>
+          <div class="diam-wrap">
+            <div class="diam-shape"></div>
+            <div class="diam-txt">Risk<br/>State?</div>
+          </div>
+          <div class="ad">↓</div>
+          <div class="risks">
+            <div class="rb rbn">🟢 NORMAL</div>
+            <div class="rb rbw">🟡 WATCH</div>
+            <div class="rb rbwa">🟠 WARNING</div>
+            <div class="rb rbc">🔴 CRITICAL</div>
+          </div>
+        </div>
+
+        <!-- RIGHT PIPELINE -->
+        <div class="col">
+          <div class="col-lbl">— Vulnerability Pipeline —</div>
+          <div class="b bw190">
+            <span class="ico">👴🤰👧🦽</span>
+            <strong>Vulnerability Index</strong><br/>
+            <span class="sub">Elderly · Pregnant · Children<br/>Specially-abled (ward-wise count)</span>
+          </div>
+          <div class="ad">↓</div>
+          <div class="b bw190">
+            <span class="ico">🏔️ → 🌊</span>
+            <strong>Upstream Propagation Model</strong><br/>
+            <span class="sub">Ward 1 (1240m) → Ward 3 (760m) → Ward 4 (620m)<br/>Predicts which ward floods next</span>
+          </div>
+          <div class="ad">↓</div>
+          <div class="b bw190">
+            <span class="ico">🚨</span>
+            <strong>Priority Classification</strong><br/>
+            <span class="sub">Schools / Hospitals → <strong>EVACUATE FIRST</strong><br/>Anganwadis → <strong>NOTIFY</strong><br/><em>auto-triggered at WARNING+</em></span>
+          </div>
+        </div>
+
+      </div><!-- /two -->
+
+      <!-- CONVERGE -->
+      <div class="conv">↓ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ↓</div>
+      <hr class="divl"/>
+
+      <!-- INFRASTRUCTURE -->
+      <div class="b bw390 bthick">
+        <span class="ico">🌉 🛣️ 🏠</span>
+        <strong>Infrastructure State Engine</strong><br/>
+        <span class="sub">East Bridge: OPEN → CAUTION → CLOSED &nbsp;|&nbsp; Shelter: STANDBY → PREPARING → OPEN<br/>Safe Route activates on ward map at WARNING+</span>
+      </div>
+      <div class="ad">↓</div>
+
+      <!-- ALERT + OFFLINE -->
+      <div class="alert-row">
+        <div class="b" style="width:196px;">
+          <span class="ico">🔔</span>
+          <strong>Alert Generation</strong><br/>
+          <span class="sub">🇬🇧 English Alert Card<br/>🇮🇳 हिंदी Alert Card (Devanagari)</span>
+        </div>
+        <div class="offline">
+          <span style="font-size:16px;">📵</span><br/>
+          <strong>Offline Mode</strong><br/>
+          <span class="sub">SVG Map + Cached Data<br/>Zero internet needed<br/>Works when towers cut</span>
+        </div>
+      </div>
+      <div class="ad">↓</div>
+
+      <!-- ALERT CHAIN -->
+      <div class="b bw390">
+        <span class="ico">🔗</span>
+        <strong>Alert Chain</strong> (Timestamped)<br/>
+        <span class="sub">👤 Volunteer &nbsp;→&nbsp; 🧑‍💼 Coordinator &nbsp;→&nbsp; 🏛️ District Response Team</span>
+      </div>
+
+    </div><!-- /main -->
+  </div><!-- /body -->
+
+  <!-- LOGO -->
+  <div class="logo"><span>Jeevan</span>Setu</div>
+
+</div><!-- /slide -->
+</body>
+</html>

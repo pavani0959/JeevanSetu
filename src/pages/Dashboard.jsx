@@ -13,7 +13,9 @@ import { useConnectivity } from '../hooks/useConnectivity';
 import { runSelfTest }     from '../engine/riskEngine';
 
 // Phase 3 — Map & Monitoring
-import WardMap             from '../components/map/WardMap';
+import LeafletWardMap      from '../components/map/LeafletWardMap';
+import MLPredictionPanel   from '../components/panels/MLPredictionPanel';
+import LiveWeatherPanel    from '../components/panels/LiveWeatherPanel';
 import TelemetryBar        from '../components/panels/TelemetryBar';
 import RiskScorePanel      from '../components/panels/RiskScorePanel';
 import MicroTrendPanel     from '../components/panels/MicroTrendPanel';
@@ -34,6 +36,8 @@ import SensorNetworkTable     from '../components/panels/SensorNetworkTable';
 import WardRiskMatrixTable    from '../components/panels/WardRiskMatrixTable';
 import EmergencySOPGuide      from '../components/panels/EmergencySOPGuide';
 import ControlCenterDirectory from '../components/panels/ControlCenterDirectory';
+import DataSourcePanel        from '../components/panels/DataSourcePanel';
+import RoleSwitcher from '../components/shared/RoleSwitcher';
 
 export default function Dashboard() {
   const scenarioCtx  = useScenario();
@@ -41,6 +45,10 @@ export default function Dashboard() {
 
   // Language state (defaults to Hindi bilingual mode for rural intuitiveness)
   const [isHindi, setIsHindi] = useState(true);
+
+  // Role-based view state
+  const [activeRole, setActiveRole] = useState('ADMIN');
+  const isVolunteer = activeRole === 'VOLUNTEER';
 
   const {
     scenarioKey, setScenario,
@@ -116,9 +124,9 @@ export default function Dashboard() {
         </div>
 
         {/* ── MAIN 3-COLUMN GRID ─────────────────────────────── */}
-        <main style={{
+        <main className="dashboard-main-grid" style={{
           display: 'grid',
-          gridTemplateColumns: '300px 1fr 310px',
+          gridTemplateColumns: isVolunteer ? '1fr' : '300px 1fr 310px',
           gap: '16px',
           padding: '16px 20px',
           maxWidth: '1920px',
@@ -127,11 +135,17 @@ export default function Dashboard() {
           boxSizing: 'border-box',
         }}>
 
-          {/* ── LEFT SIDEBAR ──────────────────────────────────── */}
-          <aside style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {/* ── ROLE SWITCHER (Always visible) ───────────────── */}
+          <aside style={{ display: 'flex', flexDirection: 'column', gap: '16px', gridColumn: isVolunteer ? '1 / -1' : 'auto', marginBottom: isVolunteer ? '0' : '0' }}>
+            <Card title={isHindi ? "उपयोगकर्ता भूमिका — Role" : "User Role View"}>
+              <RoleSwitcher activeRole={activeRole} setActiveRole={setActiveRole} isHindi={isHindi} />
+            </Card>
 
-            {/* Cloudburst Scenario Simulator */}
-            <Card title={isHindi ? "मौसम एवं परिस्थिति नियंत्रण" : "Cloudburst Scenario Controls"}>
+            {/* ── LEFT SIDEBAR (Hides in Volunteer mode) ────────── */}
+            {!isVolunteer && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {/* Cloudburst Scenario Simulator */}
+                <Card title={isHindi ? "मौसम एवं परिस्थिति नियंत्रण" : "Cloudburst Scenario Controls"}>
               <SimulatorPanel
                 scenarioKey={scenarioKey}
                 setScenario={setScenario}
@@ -158,20 +172,30 @@ export default function Dashboard() {
                 onWardChange={setSelectedWardId}
               />
             </Card>
+              </div>
+            )}
           </aside>
 
           {/* ── CENTRE — Map + Emergency Alert ──────────────────── */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <Card
-              title={isHindi ? "जीवनपुर घाटी — वार्ड और खतरे का नक्शा" : "Ward Risk Map — Jeevanpur Valley Basin"}
+              title={isHindi ? "जीवनपुर घाटी — चमोली, उत्तराखंड (वास्तविक स्थान)" : "Ward Risk Map — Chamoli, Uttarakhand (Real Himalayan Terrain)"}
               titleRight={
-                <span style={{ fontSize: '11px', color: 'var(--color-muted-bright)' }}>
-                  {isHindi ? "नक्शे पर किसी भी वार्ड को दबाएँ" : "Interactive Terrain · Click ward to inspect"}
+                <span style={{
+                  fontSize: '10px',
+                  background: 'rgba(34,197,94,0.12)',
+                  border: '1px solid rgba(34,197,94,0.3)',
+                  color: '#22c55e',
+                  padding: '2px 8px',
+                  borderRadius: 12,
+                  fontWeight: 700,
+                }}>
+                  🗺️ OpenStreetMap · Live Tiles
                 </span>
               }
               style={{ flex: 1 }}
             >
-              <WardMap
+              <LeafletWardMap
                 scenarioKey={scenarioKey}
                 selectedWardId={selectedWardId}
                 onWardClick={setSelectedWardId}
@@ -185,7 +209,22 @@ export default function Dashboard() {
           </div>
 
           {/* ── RIGHT SIDEBAR ─────────────────────────────────── */}
-          <aside style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <aside className="dashboard-right-sidebar" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+
+            {/* 🌐 Live Weather — Open-Meteo API (Chamoli, Uttarakhand) */}
+            <Card title={isHindi ? "वास्तविक मौसम — चमोली, उत्तराखंड" : "Live Weather — Chamoli, Uttarakhand"}>
+              <LiveWeatherPanel />
+            </Card>
+
+            {/* 🤖 ML Risk Prediction — Random Forest (98.3% accuracy) */}
+            <Card title={isHindi ? "ML खतरे का पूर्वानुमान (Random Forest)" : "ML Risk Prediction — Random Forest Model"}>
+              <MLPredictionPanel
+                rainfall={liveRainfall}
+                soil={liveSoil}
+                stream={liveStream}
+                terrain={0.92}
+              />
+            </Card>
 
             <Card title={isHindi ? "वार्ड 4 — खतरे का स्कोर" : "Risk Score Analytics — Ward 4"}>
               <RiskScorePanel riskResult={riskResult} scenarioKey={scenarioKey} />
@@ -206,7 +245,7 @@ export default function Dashboard() {
         </main>
 
         {/* ── SECTION 2 — Priority Assistance & Response Timeline ── */}
-        <section style={{
+        <section className="dashboard-section-2col" style={{
           display: 'grid',
           gridTemplateColumns: '1fr 1fr',
           gap: '16px',
@@ -272,6 +311,18 @@ export default function Dashboard() {
         }}>
           <Card>
             <ControlCenterDirectory />
+          </Card>
+        </section>
+
+        {/* ── SECTION 7 — Data Source Transparency ─────────────── */}
+        <section style={{
+          padding: '0 20px 16px',
+          maxWidth: '1920px',
+          margin: '0 auto',
+          width: '100%',
+        }}>
+          <Card title={isHindi ? "डेटा स्रोत — पारदर्शिता रिपोर्ट" : "Data Source Transparency — IMD / CWC / NRSC / Open-Meteo"}>
+            <DataSourcePanel isHindi={isHindi} />
           </Card>
         </section>
 
