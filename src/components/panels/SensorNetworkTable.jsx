@@ -141,11 +141,11 @@ export default function SensorNetworkTable({ scenarioKey }) {
           <thead>
             <tr style={{ background: 'rgba(255,255,255,0.04)', color: 'var(--color-muted-bright)', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
               <th style={{ padding: '10px 12px', fontWeight: 600 }}>Station ID & Name</th>
-              <th style={{ padding: '10px 12px', fontWeight 600 }}>Sensor Type</th>
-              <th style={{ padding: '10px 12px', fontWeight 600 }}>Elevation</th>
-              <th style={{ padding: '10px 12px', fontWeight 600 }}>Live Telemetry</th>
-              <th style={{ padding: '10px 12px', fontWeight 600 }}>Battery & Signal</th>
-              <th style={{ padding: '10px 12px', fontWeight 600 }}>Node Status</th>
+              <th style={{ padding: '10px 12px', fontWeight: 600 }}>Sensor Type</th>
+              <th style={{ padding: '10px 12px', fontWeight: 600 }}>Elevation</th>
+              <th style={{ padding: '10px 12px', fontWeight: 600 }}>Live Telemetry</th>
+              <th style={{ padding: '10px 12px', fontWeight: 600 }}>Battery & Signal</th>
+              <th style={{ padding: '10px 12px', fontWeight: 600 }}>Node Status</th>
             </tr>
           </thead>
           <tbody>
